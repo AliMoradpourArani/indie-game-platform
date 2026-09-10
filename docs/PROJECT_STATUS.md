@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 8 — Testing & Security ✅ → moving to Phase 9 (Production Readiness)
+- **Phase:** 9 — Production Readiness ✅ → ALL PHASES 0–9 COMPLETE (local scope)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -59,10 +59,14 @@
       audit triage + AuthZ matrix in SECURITY.md, E2E plan in TESTING.md
 - [x] Phase 8: 32/32 runnable backend tests green (7 DB journey tests skip);
       both apps build clean
+- [x] Phase 9: `docs/PRODUCTION.md` (Stage-1 target, checklists, runbooks, launch
+      gate). No cloud deploy — not requested; no premature infrastructure.
 
 ## In progress
 
-- Phase 9 scaffolding: production readiness docs (prod config, backups, runbooks — no deploy)
+- None. Next: run the DB-gated tests + seed on a Docker machine
+  (`docker compose up -d db`, `npm run db:migrate`, `npm run db:seed`, `TEST_DATABASE_URL=… npm test`),
+  then browser E2E per `TESTING.md` §5.
 
 ## Broken / blockers
 

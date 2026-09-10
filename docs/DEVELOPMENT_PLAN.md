@@ -95,7 +95,8 @@ project brief (§48). Never claim completion with missing parts.
 - [x] E2E plan recorded; harness deferred until live DB (no un-runnable tests committed)
 - [x] 32/32 runnable backend tests green; both apps build; `tsc` clean
 
-## Phase 9 — Production Readiness (only when local is stable)
+## Phase 9 — Production Readiness ✅ (plan only)
 
-- Prod config, backup/restore drills, object-storage swap, CDN plan, runbooks.
-- No cloud deploy unless explicitly requested.
+- [x] `docs/PRODUCTION.md`: Stage-1 target, config checklist, backup/restore drills,
+      runbooks, monitoring minimum, launch gate
+- [x] No cloud deploy (not requested); no Stage 2/3 infrastructure introduced
