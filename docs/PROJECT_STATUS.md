@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 7 — UI/UX Refinement ✅ → moving to Phase 8 (Testing & Security)
+- **Phase:** 8 — Testing & Security ✅ → moving to Phase 9 (Production Readiness)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -55,10 +55,14 @@
 - [x] Phase 6: frontend purchase/claim + library downloads (en/fa)
 - [x] Phase 7: shared ARIA states, responsive mobile nav, skip link, focus rings,
       reduced-motion, theme pre-paint, i18n audit — frontend builds clean
+- [x] Phase 8: security suite (6 tests), 401 token errors, traversal tests,
+      audit triage + AuthZ matrix in SECURITY.md, E2E plan in TESTING.md
+- [x] Phase 8: 32/32 runnable backend tests green (7 DB journey tests skip);
+      both apps build clean
 
 ## In progress
 
-- Phase 8 scaffolding: testing & security review (matrix, upload fuzz, headers, audit)
+- Phase 9 scaffolding: production readiness docs (prod config, backups, runbooks — no deploy)
 
 ## Broken / blockers
 

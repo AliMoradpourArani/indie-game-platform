@@ -18,4 +18,10 @@ describe('storage keys', () => {
     expect(() => resolveKey(root, '../../etc/passwd')).toThrow();
     expect(() => resolveKey(root, 'games/g1/file.zip')).not.toThrow();
   });
+
+  it('strips directory components from hostile upload filenames', () => {
+    // Multer-supplied originalname "../../etc/passwd" must collapse to a bare name.
+    expect(buildGameKey('g1', '1.0', 'WINDOWS', '../../etc/passwd')).toBe('games/g1/1.0/windows/passwd');
+    expect(buildGameKey('g1', '1.0', 'WINDOWS', 'C:\\fakepath\\demo.zip')).toContain('demo.zip');
+  });
 });

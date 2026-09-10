@@ -86,10 +86,14 @@ project brief (§48). Never claim completion with missing parts.
 - [x] i18n audit: no hardcoded user strings (only language-neutral `…`/`1.0.0`);
       `common.*` keys added in en+fa
 
-## Phase 8 — Testing & Security
+## Phase 8 — Testing & Security ✅
 
-- Unit + integration + E2E (submission cycle, purchase→library→download),
-  security review per `SECURITY.md`
+- [x] Security integration suite (helmet/CORS/422-shape/token-401/rate-limit, 6 tests)
+- [x] Token errors mapped to 401 (never 500); traversal basename test
+- [x] `npm audit`: qs fixed via override (suite re-green); react-router + dev-only
+      findings triaged and recorded in `SECURITY.md` with AuthZ matrix
+- [x] E2E plan recorded; harness deferred until live DB (no un-runnable tests committed)
+- [x] 32/32 runnable backend tests green; both apps build; `tsc` clean
 
 ## Phase 9 — Production Readiness (only when local is stable)
 

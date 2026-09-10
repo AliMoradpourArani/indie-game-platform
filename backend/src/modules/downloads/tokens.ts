@@ -1,6 +1,7 @@
 // Short-lived HMAC download tokens binding (userId, buildId, expiry).
 // Stage 0: tokens are redeemed at GET /files/<token>. Future: S3 signed URLs.
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { Errors } from '../../common/errors.js';
 
 function b64url(input: Buffer | string): string {
   return Buffer.from(input).toString('base64url');
@@ -23,13 +24,18 @@ export function createDownloadToken(
 
 export function verifyDownloadToken(token: string, secret: string, nowSec = Date.now() / 1000): DownloadClaims {
   const [payload, sig] = token.split('.');
-  if (!payload || !sig) throw new Error('Malformed download token');
+  if (!payload || !sig) throw Errors.unauthorized('Malformed download token');
   const expected = createHmac('sha256', secret).update(payload).digest('base64url');
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) throw new Error('Invalid download token signature');
-  const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as DownloadClaims;
-  if (typeof claims.exp !== 'number' || claims.exp <= nowSec) throw new Error('Download token expired');
-  if (!claims.userId || !claims.buildId) throw new Error('Malformed download token claims');
+  if (a.length !== b.length || !timingSafeEqual(a, b)) throw Errors.unauthorized('Invalid download token');
+  let claims: DownloadClaims;
+  try {
+    claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as DownloadClaims;
+  } catch {
+    throw Errors.unauthorized('Malformed download token');
+  }
+  if (typeof claims.exp !== 'number' || claims.exp <= nowSec) throw Errors.unauthorized('Download token expired');
+  if (!claims.userId || !claims.buildId) throw Errors.unauthorized('Malformed download token');
   return claims;
 }

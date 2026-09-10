@@ -49,3 +49,28 @@ List endpoints scope by role. Tests must cover cross-user access denial.
 AuthN/Z matrix test, upload fuzz (oversize/wrong-type/traversal), rate-limit test,
 header test, dependency audit (`npm audit`), seed-credential rotation check, backup
 restore drill (Phase 9).
+
+## 6. Authorization matrix (audited Phase 8 — all enforced server-side)
+
+| Endpoint | PLAYER | DEVELOPER | ADMIN | Unauth |
+|---|---|---|---|---|
+| `GET /games`, `/games/:slug`, `/genres`, `/developers/:id` | ✅ | ✅ | ✅ | ✅ (published only) |
+| `POST /auth/register` (PLAYER/DEVELOPER only) | ✅ | ✅ | ✅ | ✅ |
+| `GET /auth/me`, `/users/me`, `/library`, downloads | ✅ | ✅ | ✅ | ❌ 401 |
+| `POST /developer/*` (own games only) | ❌ 403 | ✅ own | ✅ | ❌ 401 |
+| `POST /admin/*`, `GET /admin/*` | ❌ 403 | ❌ 403 | ✅ | ❌ 401 |
+
+Cross-user writes tested (`games.test.ts`: 403 on foreign game; `submissions.test.ts`:
+player denied admin claim). Middleware unit-tested (`rbac.test.ts`).
+
+## 7. Dependency audit (2026-09-10)
+
+- `qs` GHSA (via Express 4): **fixed** — forced to 6.16.0 via root `overrides`,
+  full suite re-run green (32 passed).
+- `react-router` 2× moderate (≤7.17.0): **accepted risk** — SSR hydration issue
+  N/A (no SSR); backslash open-redirect N/A (no user-controlled `to` targets).
+  Revisit: upgrade to React Router v7 when convenient.
+- `vite`/`vitest` high/critical: **dev-only** (localhost dev servers, never shipped
+  or exposed); no action beyond keeping them loopback-bound.
+- Auth rate limit (60/15min credential endpoints) + helmet + CORS allowlist +
+  Zod-422 mapping covered by `tests/integration/security.test.ts` (6 tests).
