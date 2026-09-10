@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 6 — Purchases & Library ✅ → moving to Phase 7 (UI/UX Refinement)
+- **Phase:** 7 — UI/UX Refinement ✅ → moving to Phase 8 (Testing & Security)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -53,10 +53,12 @@
 - [x] Phase 6: 25/25 runnable backend tests green (7 DB journey tests skip);
       both apps build clean
 - [x] Phase 6: frontend purchase/claim + library downloads (en/fa)
+- [x] Phase 7: shared ARIA states, responsive mobile nav, skip link, focus rings,
+      reduced-motion, theme pre-paint, i18n audit — frontend builds clean
 
 ## In progress
 
-- Phase 7 scaffolding: UI/UX refinement (design polish, states, a11y, theme/i18n pass)
+- Phase 8 scaffolding: testing & security review (matrix, upload fuzz, headers, audit)
 
 ## Broken / blockers
 

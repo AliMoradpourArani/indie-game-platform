@@ -31,6 +31,7 @@
   },
   "theme": { "light": "Light", "dark": "Dark" },
   "lang": { "label": "Language" },
+  "common": { "loading": "Loading…", "retry": "Retry", "menu": "Menu", "close": "Close", "skipToContent": "Skip to content" },
   "placeholder": { "title": "Coming in a later phase", "body": "This screen is a Phase 1 placeholder. The real feature lands in its planned phase." },
   "health": { "backend": "Backend status" },
   "home": { "newest": "Newest games", "viewAll": "View all", "empty": "No published games yet. Developers: submit your first game for review!" },

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, apiGet, apiPost } from '../lib/api';
 import { useAuth } from './auth';
+import { Empty, Loading } from '../design/states';
 
 export interface CardGame {
   id: string;
@@ -93,10 +94,8 @@ export function BrowsePage() {
           <option value="title">{t('browse.byTitle')}</option>
         </select>
       </div>
-      {!result && <p className="text-sm opacity-60">…</p>}
-      {result && result.data.length === 0 && (
-        <div className="surface p-8 text-center text-sm opacity-70">{t('browse.empty')}</div>
-      )}
+      {!result && <Loading />}
+      {result && result.data.length === 0 && <Empty title={t('browse.empty')} />}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {result?.data.map((g) => (
           <GameCard key={g.id} game={g} />
@@ -181,8 +180,8 @@ export function GamePage() {
     }
   }
 
-  if (missing) return <p className="surface mx-auto max-w-xl p-8 text-center text-sm">{t('browse.notFound')}</p>;
-  if (!game) return <p className="text-sm opacity-60">…</p>;
+  if (missing) return <Empty title={t('browse.notFound')} />;
+  if (!game) return <Loading />;
 
   const latest = game.versions[0];
   const studio = game.developer.developerProfile?.studioName ?? game.developer.profile?.displayName;
@@ -328,7 +327,7 @@ export function LibraryPage() {
   return (
     <div className="grid gap-5">
       <h1 className="text-2xl font-extrabold">{t('library.title')}</h1>
-      {items.length === 0 && <p className="surface p-6 text-sm opacity-60">{t('library.empty')}</p>}
+      {items.length === 0 && <Empty title={t('library.empty')} />}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((e) => (
           <div key={e.id} className="surface p-4">

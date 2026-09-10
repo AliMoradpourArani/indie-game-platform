@@ -76,9 +76,15 @@ project brief (§48). Never claim completion with missing parts.
       retry→confirm→library→allow, free grant)
 - [x] Frontend: purchase/claim flow on game page, library with per-platform downloads
 
-## Phase 7 — UI/UX Refinement
+## Phase 7 — UI/UX Refinement ✅
 
-- Design system pass, loading/empty/error states, a11y, theme polish, full en/fa
+- [x] Shared design states (`Loading`/`Empty`/`ErrorNote` with ARIA roles) used
+      across browse/game/library
+- [x] Responsive mobile nav (hamburger + labelled menu), skip-to-content link,
+      visible focus rings, `prefers-reduced-motion` support
+- [x] Theme/locale pre-paint script (no flash, correct `dir`/`lang` on first paint)
+- [x] i18n audit: no hardcoded user strings (only language-neutral `…`/`1.0.0`);
+      `common.*` keys added in en+fa
 
 ## Phase 8 — Testing & Security
 
