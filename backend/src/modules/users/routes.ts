@@ -3,6 +3,7 @@ import type { Response } from 'express';
 import { prisma } from '../../infrastructure/db.js';
 import { requireAuth, type AuthRequest } from '../auth/middleware.js';
 import { getMe } from '../auth/service.js';
+import { getDeveloperProfile } from './profile.js';
 
 export function usersRouter(): Router {
   const router = Router();
@@ -10,6 +11,14 @@ export function usersRouter(): Router {
   router.get('/users/me', requireAuth, async (req: AuthRequest, res: Response, next) => {
     try {
       res.json(await getMe({ db: prisma }, req.auth!.sub));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/developers/:id', async (req, res, next) => {
+    try {
+      res.json(await getDeveloperProfile(prisma, req.params.id));
     } catch (err) {
       next(err);
     }

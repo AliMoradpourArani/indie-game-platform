@@ -15,6 +15,7 @@ import {
   uploadBuild,
   uploadMedia,
 } from './service.js';
+import { browseGames, browseQuerySchema, genres } from './discovery.js';
 import { createBuildSchema, createGameSchema, createVersionSchema, updateGameSchema } from './validation.js';
 
 const upload = multer({
@@ -31,6 +32,22 @@ export function gamesRouter(): Router {
   const router = Router();
 
   // Public discovery (publish-gated; browse UI lands in Phase 5).
+  router.get('/games', async (req: Request, res: Response, next) => {
+    try {
+      res.json(await browseGames(prisma, browseQuerySchema.parse(req.query)));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/genres', async (_req: Request, res: Response, next) => {
+    try {
+      res.json(await genres(prisma));
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.get('/games/:slug', async (req: Request, res: Response, next) => {
     try {
       res.json(await getPublicGame(deps(), req.params.slug));

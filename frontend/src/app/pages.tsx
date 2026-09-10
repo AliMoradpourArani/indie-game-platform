@@ -2,19 +2,24 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { apiGet } from '../lib/api';
+import { GameCard, type BrowseResult } from './games';
 
 export function HomePage() {
   const { t } = useTranslation();
   const [backend, setBackend] = useState<string>('…');
+  const [newest, setNewest] = useState<BrowseResult | null>(null);
 
   useEffect(() => {
     apiGet<{ status: string }>('/api/v1/health')
       .then((h) => setBackend(h.status))
       .catch(() => setBackend('unreachable (start backend :4000)'));
+    apiGet<BrowseResult>('/api/v1/games?sort=newest&pageSize=6')
+      .then(setNewest)
+      .catch(() => setNewest({ data: [], page: 1, pageSize: 6, total: 0 }));
   }, []);
 
   return (
-    <section className="grid gap-6">
+    <section className="grid gap-8">
       <div className="surface p-8 sm:p-12">
         <h1 className="max-w-2xl text-3xl font-extrabold leading-tight sm:text-5xl">{t('hero.title')}</h1>
         <p className="mt-3 max-w-xl text-base opacity-70">{t('hero.subtitle')}</p>
@@ -25,13 +30,20 @@ export function HomePage() {
           </span>
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        {['featured', 'newest', 'popular'].map((slot) => (
-          <div key={slot} className="surface p-5">
-            <h2 className="font-bold capitalize">{slot}</h2>
-            <p className="mt-1 text-sm opacity-60">{t('placeholder.body')}</p>
-          </div>
-        ))}
+
+      <div>
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xl font-extrabold">{t('home.newest')}</h2>
+          <Link to="/browse" className="text-sm underline opacity-70">{t('home.viewAll')}</Link>
+        </div>
+        {newest && newest.data.length === 0 && (
+          <p className="surface mt-3 p-6 text-sm opacity-60">{t('home.empty')}</p>
+        )}
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {newest?.data.map((g) => (
+            <GameCard key={g.id} game={g} />
+          ))}
+        </div>
       </div>
     </section>
   );

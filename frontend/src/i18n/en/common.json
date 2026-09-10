@@ -33,6 +33,27 @@
   "lang": { "label": "Language" },
   "placeholder": { "title": "Coming in a later phase", "body": "This screen is a Phase 1 placeholder. The real feature lands in its planned phase." },
   "health": { "backend": "Backend status" },
+  "home": { "newest": "Newest games", "viewAll": "View all", "empty": "No published games yet. Developers: submit your first game for review!" },
+  "browse": {
+    "title": "Browse games",
+    "search": "Search title or description…",
+    "allGenres": "All genres",
+    "newest": "Newest first",
+    "byTitle": "By title",
+    "empty": "No games match. Try a different search.",
+    "results": "game(s) found",
+    "free": "Free",
+    "notFound": "This game is not available.",
+    "gamesByStudio": "Games by this studio ({{count}})"
+  },
+  "game": {
+    "demo": "Download demo",
+    "buy": "Purchase",
+    "purchaseHint": "Purchases and library downloads land in Phase 6.",
+    "media": "Media",
+    "requirements": "System requirements",
+    "versions": "Version history"
+  },
   "dev": {
     "myGames": "My games",
     "empty": "No games yet — create your first draft on the right.",

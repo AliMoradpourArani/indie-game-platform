@@ -134,6 +134,7 @@ export async function getPublicGame(deps: Pick<Deps, 'db'>, slug: string) {
       versions: { include: { builds: true }, orderBy: { createdAt: 'desc' } },
       media: { orderBy: { sortOrder: 'asc' } },
       submissions: { orderBy: { updatedAt: 'desc' }, take: 1 },
+      developer: { select: { id: true, profile: { select: { displayName: true } }, developerProfile: { select: { studioName: true, verified: true } } } },
     },
   });
   if (!game) throw Errors.notFound('Game not found');

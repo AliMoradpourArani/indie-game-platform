@@ -54,10 +54,14 @@ project brief (§48). Never claim completion with missing parts.
       withdraw→resubmit→approve→publish→public visible→history/audit)
 - [x] Frontend: submission panel on game detail, admin dashboard + review pages (en/fa)
 
-## Phase 5 — Public Game Platform
+## Phase 5 — Public Game Platform ✅
 
-- Homepage, featured/new/popular, categories, search+filters, game pages,
-  developer profiles, responsive UI
+- [x] Homepage (hero + newest games, live backend status)
+- [x] Discovery API: `GET /games` (published-only, search/genre/tag/sort/pagination),
+      `GET /genres`, publish-gated `GET /games/:slug` (+studio), `GET /developers/:id`
+- [x] Frontend: browse (search + filters), game detail (media/requirements/versions/demo+buy),
+      developer profile pages; responsive card grids
+- [x] Purchase/library buttons present but inert (wired in Phase 6)
 
 ## Phase 6 — Purchases & Library
 

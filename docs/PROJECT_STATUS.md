@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 4 — Submission & Review ✅ → moving to Phase 5 (Public Game Platform)
+- **Phase:** 5 — Public Game Platform ✅ → moving to Phase 6 (Purchases & Library)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -44,10 +44,14 @@
 - [x] Phase 4: 24/24 runnable backend tests green (5 DB journey tests skip:
       auth 2, games 2, full review cycle 1); both apps build clean
 - [x] Phase 4: frontend submission panel + admin dashboard/review pages (en/fa)
+- [x] Phase 5: discovery API (browse/genres/published detail/dev profile) +
+      frontend home/browse/game/developer pages with responsive cards
+- [x] Phase 5: 25/25 runnable backend tests green (5 DB journey tests skip);
+      both apps build clean
 
 ## In progress
 
-- Phase 5 scaffolding: public discovery (homepage lists, search/filter, game + developer pages)
+- Phase 6 scaffolding: purchases (local provider), entitlements, library, controlled downloads
 
 ## Broken / blockers
 

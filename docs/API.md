@@ -24,13 +24,16 @@ POST /auth/login {email,password} → {token,user}
 POST /auth/logout
 GET  /users/me                     # Bearer required
 
-# Games & versions (Phase 3)
-GET  /games?search&genre&tag&sort&…
+# Games & versions (Phase 3) ✅ / discovery (Phase 5) ✅
+GET  /games?search&genre&tag&sort=newest|title&page&pageSize  # published only
+GET  /genres
 GET  /games/:slug
+GET  /developers/:id
 POST /developer/games              # DEVELOPER, creates DRAFT
 PATCH /developer/games/:id
 POST /developer/games/:id/versions
-POST /developer/games/:id/media    # multipart via StorageService
+POST /developer/versions/:versionId/builds  # multipart .zip
+POST /developer/games/:id/media    # multipart image
 
 # Submissions & admin review (Phase 4) ✅
 POST /developer/games/:id/submit            # DRAFT→PENDING_REVIEW
