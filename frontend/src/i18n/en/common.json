@@ -52,6 +52,30 @@
     "stateApproved": "Approved",
     "stateChangesRequired": "Changes required",
     "stateRejected": "Rejected",
-    "statePublished": "Published"
+    "statePublished": "Published",
+    "review": "Review status",
+    "submit": "Submit for review",
+    "withdraw": "Withdraw to draft",
+    "publish": "Publish"
+  },
+  "adminS": {
+    "dashboard": "Admin dashboard",
+    "pending": "Pending review",
+    "changesRequested": "Changes requested",
+    "published": "Published games",
+    "developers": "Developers",
+    "users": "Users",
+    "queue": "Review queue",
+    "queueEmpty": "Queue is clear. Nothing waiting for review.",
+    "review": "Review",
+    "claim": "Start review",
+    "decision": "Decision + feedback",
+    "feedbackPlaceholder": "Write clear, actionable feedback for the developer…",
+    "approve": "Approve",
+    "requestChanges": "Request changes",
+    "reject": "Reject",
+    "history": "Review history",
+    "noReviews": "No reviews yet.",
+    "auditTrail": "Audit trail"
   }
 }

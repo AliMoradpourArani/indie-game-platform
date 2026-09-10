@@ -43,10 +43,16 @@ project brief (§48). Never claim completion with missing parts.
 - [x] Tests: unit (slug/version/sniff/validation) + DB-gated integration journey
 - [x] Frontend: developer dashboard (list + states, create draft, versions)
 
-## Phase 4 — Submission & Review
+## Phase 4 — Submission & Review ✅
 
-- Submission state machine + transitions API, admin review queue + feedback,
-  resubmit flow, review history, audit logging
+- [x] State-machine transitions API (submit/withdraw/claim/review/publish) with
+      `assertTransition` + per-transition audit rows
+- [x] Admin login (Phase 2) + dashboard (overview counts, review queue, review
+      detail with claim/approve/request-changes/reject + comment, history + audit trail)
+- [x] Developer feedback view (latest submission + admin reviews) + resubmit loop
+- [x] Tests: RBAC unit + full-cycle DB-gated integration (submit→claim→changes→
+      withdraw→resubmit→approve→publish→public visible→history/audit)
+- [x] Frontend: submission panel on game detail, admin dashboard + review pages (en/fa)
 
 ## Phase 5 — Public Game Platform
 

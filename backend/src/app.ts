@@ -4,9 +4,11 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { loadConfig } from './config/env.js';
 import { errorHandler, notFound, requestId, requestLogger } from './common/middleware.js';
+import { adminRouter } from './modules/admin/routes.js';
 import { authRouter } from './modules/auth/routes.js';
 import { gamesRouter } from './modules/games/routes.js';
 import { healthRouter } from './modules/health/routes.js';
+import { submissionsRouter } from './modules/submissions/routes.js';
 import { usersRouter } from './modules/users/routes.js';
 
 export function createApp(): express.Express {
@@ -31,6 +33,8 @@ export function createApp(): express.Express {
   app.use('/api/v1', healthRouter());
   app.use('/api/v1', authRouter());
   app.use('/api/v1', gamesRouter());
+  app.use('/api/v1', submissionsRouter());
+  app.use('/api/v1', adminRouter());
   app.use('/api/v1', usersRouter());
   void config;
 

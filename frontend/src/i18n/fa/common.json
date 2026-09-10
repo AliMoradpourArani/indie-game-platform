@@ -52,6 +52,30 @@
     "stateApproved": "تأیید شده",
     "stateChangesRequired": "نیازمند اصلاح",
     "stateRejected": "رد شده",
-    "statePublished": "منتشر شده"
+    "statePublished": "منتشر شده",
+    "review": "وضعیت بررسی",
+    "submit": "ارسال برای بررسی",
+    "withdraw": "بازگرداندن به پیش‌نویس",
+    "publish": "انتشار"
+  },
+  "adminS": {
+    "dashboard": "داشبورد مدیریت",
+    "pending": "در انتظار بررسی",
+    "changesRequested": "نیازمند اصلاح",
+    "published": "بازی‌های منتشر شده",
+    "developers": "توسعه‌دهندگان",
+    "users": "کاربران",
+    "queue": "صف بررسی",
+    "queueEmpty": "صف خالی است. چیزی در انتظار بررسی نیست.",
+    "review": "بررسی",
+    "claim": "شروع بررسی",
+    "decision": "تصمیم + بازخورد",
+    "feedbackPlaceholder": "بازخورد شفاف و قابل اقدام برای توسعه‌دهنده بنویسید…",
+    "approve": "تأیید",
+    "requestChanges": "درخواست اصلاح",
+    "reject": "رد",
+    "history": "تاریخچه‌ی بررسی‌ها",
+    "noReviews": "هنوز بررسی‌ای ثبت نشده.",
+    "auditTrail": "رد حسابرسی"
   }
 }

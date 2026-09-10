@@ -127,6 +127,7 @@ export function DeveloperGameDetail() {
   const { token } = useAuth();
   const { id } = useParams();
   const [game, setGame] = useState<GameSummary | null>(null);
+  const [submission, setSubmission] = useState<{ id: string; state: string; reviews: { id: string; decision: string; comment: string }[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState({ version: '', changelog: '' });
   const [busy, setBusy] = useState(false);
@@ -136,6 +137,7 @@ export function DeveloperGameDetail() {
     try {
       const games = await apiGet<GameSummary[]>('/api/v1/developer/games', token);
       setGame(games.find((g) => g.id === id) ?? null);
+      setSubmission(await apiGet(`/api/v1/developer/games/${id}/submission`, token));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t('auth.genericError'));
     }
@@ -163,13 +165,54 @@ export function DeveloperGameDetail() {
   if (error) return <p className="text-sm" style={{ color: 'var(--danger)' }}>{error}</p>;
   if (!game) return <p className="text-sm opacity-60">…</p>;
 
+  const state = submission?.state ?? 'DRAFT';
+
+  async function submissionAction(path: string) {
+    if (!token || !id) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await apiPost(`/api/v1/developer/${path}`, {}, token);
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="grid gap-6">
       <div>
         <Link to="/developer" className="text-sm underline opacity-70">← {t('dev.myGames')}</Link>
         <h1 className="mt-1 text-2xl font-extrabold">{game.title}</h1>
-        <p className="text-sm opacity-60">{game.slug} · {stateLabel(game.submissions[0]?.state, t)}</p>
+        <p className="text-sm opacity-60">{game.slug} · {stateLabel(state, t)}</p>
       </div>
+
+      <section className="surface p-5">
+        <h2 className="font-bold">{t('dev.review')}</h2>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {(state === 'DRAFT' || !submission) && (
+            <button disabled={busy} onClick={() => submissionAction(`games/${id}/submit`)} className="btn-accent px-4 py-2 text-sm disabled:opacity-50">{t('dev.submit')}</button>
+          )}
+          {state === 'PENDING_REVIEW' && submission && (
+            <button disabled={busy} onClick={() => submissionAction(`submissions/${submission.id}/withdraw`)} className="surface px-4 py-2 text-sm disabled:opacity-50">{t('dev.withdraw')}</button>
+          )}
+          {state === 'APPROVED' && (
+            <button disabled={busy} onClick={() => submissionAction(`games/${id}/publish`)} className="btn-accent px-4 py-2 text-sm disabled:opacity-50">{t('dev.publish')}</button>
+          )}
+        </div>
+        {submission && submission.reviews.length > 0 && (
+          <ul className="mt-3 grid gap-2 text-sm">
+            {submission.reviews.map((r) => (
+              <li key={r.id} className="surface px-3 py-2">
+                <p><strong>{r.decision}</strong></p>
+                <p className="opacity-70">{r.comment}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
       <section className="surface p-5">
         <h2 className="font-bold">{t('dev.versions')} ({game.versions.length})</h2>
         <ul className="mt-2 grid gap-2 text-sm">

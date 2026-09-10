@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { AdminDashboard, AdminSubmissionDetail } from './admin';
 import { AdminLoginPage, LoginPage, RegisterPage } from './authPages';
 import { DeveloperDashboard, DeveloperGameDetail } from './developer';
 import { AdminLayout, PublicLayout } from './layouts';
@@ -27,7 +28,8 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { path: 'login', element: <AdminLoginPage /> },
-      { path: '', element: <PlaceholderPage name="Admin dashboard" /> },
+      { path: '', element: <AdminDashboard /> },
+      { path: 'submissions/:id', element: <AdminSubmissionDetail /> },
     ],
   },
 ]);

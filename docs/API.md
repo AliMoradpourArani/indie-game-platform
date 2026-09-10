@@ -32,12 +32,15 @@ PATCH /developer/games/:id
 POST /developer/games/:id/versions
 POST /developer/games/:id/media    # multipart via StorageService
 
-# Submissions & admin review (Phase 4)
+# Submissions & admin review (Phase 4) ✅
 POST /developer/games/:id/submit            # DRAFT→PENDING_REVIEW
 POST /developer/submissions/:id/withdraw    # →DRAFT
+GET  /developer/games/:id/submission        # latest submission + admin feedback
 GET  /admin/submissions?state=PENDING_REVIEW # ADMIN
 POST /admin/submissions/:id/review {decision,comment}  # UNDER_REVIEW→…
 GET  /admin/submissions/:id/history
+GET  /admin/overview                        # moderation-first counts
+GET  /admin/audit?take=50                   # audit trail viewer
 POST /developer/games/:id/publish           # APPROVED→PUBLISHED
 
 # Purchases, library, downloads (Phase 6)

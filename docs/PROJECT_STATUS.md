@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 3 — Game Domain ✅ → moving to Phase 4 (Submission & Review)
+- **Phase:** 4 — Submission & Review ✅ → moving to Phase 5 (Public Game Platform)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -39,10 +39,15 @@
       sniffing; ownership + edit-state guards; publish-gated public detail)
 - [x] Phase 3: 22/22 runnable backend tests green (4 DB journey tests skip);
       both apps build clean
+- [x] Phase 4: submission service (submit/withdraw/claim/review/publish + audit),
+      admin overview/queue/history endpoints, developer feedback endpoint
+- [x] Phase 4: 24/24 runnable backend tests green (5 DB journey tests skip:
+      auth 2, games 2, full review cycle 1); both apps build clean
+- [x] Phase 4: frontend submission panel + admin dashboard/review pages (en/fa)
 
 ## In progress
 
-- Phase 4 scaffolding: submission workflow (submit/withdraw/review/resubmit/publish + audit)
+- Phase 5 scaffolding: public discovery (homepage lists, search/filter, game + developer pages)
 
 ## Broken / blockers
 
