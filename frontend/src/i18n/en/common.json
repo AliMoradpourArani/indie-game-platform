@@ -32,5 +32,26 @@
   "theme": { "light": "Light", "dark": "Dark" },
   "lang": { "label": "Language" },
   "placeholder": { "title": "Coming in a later phase", "body": "This screen is a Phase 1 placeholder. The real feature lands in its planned phase." },
-  "health": { "backend": "Backend status" }
+  "health": { "backend": "Backend status" },
+  "dev": {
+    "myGames": "My games",
+    "empty": "No games yet — create your first draft on the right.",
+    "createGame": "New game draft",
+    "title": "Title",
+    "description": "Description (min 10 characters)",
+    "genre": "Genre",
+    "price": "Price (cents, 0 = free)",
+    "create": "Create draft",
+    "versions": "versions",
+    "changelog": "Changelog",
+    "addVersion": "Add version",
+    "uploadHint": "Build/media uploads use the API directly for now (multipart); dashboard upload buttons land with the submission flow.",
+    "stateDraft": "Draft",
+    "statePendingReview": "Pending review",
+    "stateUnderReview": "Under review",
+    "stateApproved": "Approved",
+    "stateChangesRequired": "Changes required",
+    "stateRejected": "Rejected",
+    "statePublished": "Published"
+  }
 }

@@ -32,11 +32,16 @@ project brief (§48). Never claim completion with missing parts.
       (register→login→me→logout, duplicate 409, developer profile) — runs with `TEST_DATABASE_URL`
 - [x] Frontend: AuthProvider, login/register/admin pages, role-aware nav, en/fa strings
 
-## Phase 3 — Game Domain
+## Phase 3 — Game Domain ✅
 
-- Games CRUD (drafts), metadata (genre/tags/requirements/price), media metadata
-- `Game` ≠ `GameVersion` ≠ build files; local uploads via `StorageService`
-- Validation (file type/size, path-traversal safe keys)
+- [x] Games CRUD (drafts), metadata (genre/tags/price), Zod validation
+- [x] `Game` ≠ `GameVersion` ≠ `GameBuild`; versions (loose semver) + per-platform builds
+- [x] Local uploads via `StorageService` (multer memory → `LocalStorageService`);
+      magic-byte sniffing, MIME allowlist, size caps, traversal-safe keys
+- [x] Ownership enforced on every write; edit blocked outside editable review states
+- [x] Public detail publish-gated (404 until a PUBLISHED submission exists)
+- [x] Tests: unit (slug/version/sniff/validation) + DB-gated integration journey
+- [x] Frontend: developer dashboard (list + states, create draft, versions)
 
 ## Phase 4 — Submission & Review
 

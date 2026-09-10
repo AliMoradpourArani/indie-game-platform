@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 2 — Authentication ✅ → moving to Phase 3 (Game Domain)
+- **Phase:** 3 — Game Domain ✅ → moving to Phase 4 (Submission & Review)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -35,10 +35,14 @@
       (AuthProvider, login/register/admin pages, role-aware nav, en/fa auth strings)
 - [x] Phase 2: 17/17 runnable backend tests green (2 DB journey tests skip without
       `TEST_DATABASE_URL`); `tsc` clean; both apps build
+- [x] Phase 3: games module (draft CRUD, versions, builds, media uploads with
+      sniffing; ownership + edit-state guards; publish-gated public detail)
+- [x] Phase 3: 22/22 runnable backend tests green (4 DB journey tests skip);
+      both apps build clean
 
 ## In progress
 
-- Phase 3 scaffolding: game domain (games, versions, builds, media, drafts)
+- Phase 4 scaffolding: submission workflow (submit/withdraw/review/resubmit/publish + audit)
 
 ## Broken / blockers
 
