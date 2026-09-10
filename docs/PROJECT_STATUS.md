@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 5 — Public Game Platform ✅ → moving to Phase 6 (Purchases & Library)
+- **Phase:** 6 — Purchases & Library ✅ → moving to Phase 7 (UI/UX Refinement)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -48,10 +48,15 @@
       frontend home/browse/game/developer pages with responsive cards
 - [x] Phase 5: 25/25 runnable backend tests green (5 DB journey tests skip);
       both apps build clean
+- [x] Phase 6: purchases (idempotent checkout, provider-verified confirm, free
+      grant), entitlements, library, controlled HMAC downloads
+- [x] Phase 6: 25/25 runnable backend tests green (7 DB journey tests skip);
+      both apps build clean
+- [x] Phase 6: frontend purchase/claim + library downloads (en/fa)
 
 ## In progress
 
-- Phase 6 scaffolding: purchases (local provider), entitlements, library, controlled downloads
+- Phase 7 scaffolding: UI/UX refinement (design polish, states, a11y, theme/i18n pass)
 
 ## Broken / blockers
 

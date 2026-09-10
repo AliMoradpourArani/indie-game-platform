@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { apiGet } from '../lib/api';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { ApiError, apiGet, apiPost } from '../lib/api';
+import { useAuth } from './auth';
 
 export interface CardGame {
   id: string;
@@ -125,8 +126,12 @@ interface GameDetail {
 export function GamePage() {
   const { t } = useTranslation();
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
   const [game, setGame] = useState<GameDetail | null>(null);
   const [missing, setMissing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void apiGet<GameDetail>(`/api/v1/games/${slug}`)
@@ -134,12 +139,54 @@ export function GamePage() {
       .catch(() => setMissing(true));
   }, [slug]);
 
+  async function downloadDemo(buildId: string) {
+    if (!game || !token) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await apiGet<{ url: string }>(`/api/v1/library/${game.id}/download/${buildId}`, token);
+      window.location.href = res.url;
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function purchase() {
+    if (!game) return;
+    if (!user || !token) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const co = await fetch('/api/v1/purchases/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': crypto.randomUUID() },
+        body: JSON.stringify({ gameId: game.id }),
+      }).then((r) => r.json());
+      if (co.checkoutId) {
+        await apiPost('/api/v1/purchases/confirm', { checkoutId: co.checkoutId }, token);
+      }
+      navigate('/library', { replace: true });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (missing) return <p className="surface mx-auto max-w-xl p-8 text-center text-sm">{t('browse.notFound')}</p>;
   if (!game) return <p className="text-sm opacity-60">…</p>;
 
   const latest = game.versions[0];
   const studio = game.developer.developerProfile?.studioName ?? game.developer.profile?.displayName;
-  const hasDemo = game.versions.some((v) => v.builds.some((b) => b.demo));
+  const demoBuild = game.versions.flatMap((v) => v.builds).find((b) => b.demo);
 
   return (
     <article className="grid gap-6">
@@ -161,9 +208,16 @@ export function GamePage() {
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <strong className="text-xl">{priceLabel(game.priceCents, t)}</strong>
-            {hasDemo && <button type="button" className="surface px-5 py-2.5 text-sm font-semibold">{t('game.demo')}</button>}
-            <button type="button" className="btn-accent px-5 py-2.5 text-sm">{t('game.buy')}</button>
+            {demoBuild && (
+              <button type="button" disabled={busy} onClick={() => downloadDemo(demoBuild.id)} className="surface px-5 py-2.5 text-sm font-semibold disabled:opacity-50">
+                {t('game.demo')}
+              </button>
+            )}
+            <button type="button" disabled={busy} onClick={purchase} className="btn-accent px-5 py-2.5 text-sm disabled:opacity-50">
+              {busy ? '…' : game.priceCents === 0 ? t('game.claim') : t('game.buy')}
+            </button>
           </div>
+          {error && <p className="mt-2 text-sm" style={{ color: 'var(--danger)' }}>{error}</p>}
           <p className="mt-2 text-xs opacity-60">{t('game.purchaseHint')}</p>
         </div>
       </div>
@@ -239,6 +293,74 @@ export function DeveloperPage() {
           <GameCard key={g.id} game={g} />
         ))}
       </div>
+    </div>
+  );
+}
+
+export function LibraryPage() {
+  const { t } = useTranslation();
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+  const [items, setItems] = useState<{ id: string; game: CardGame }[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (token) void apiGet<{ id: string; game: CardGame }[]>('/api/v1/library', token).then(setItems);
+  }, [user, token, navigate]);
+
+  async function download(gameId: string, buildId: string) {
+    if (!token) return;
+    setBusy(buildId);
+    try {
+      const res = await apiGet<{ url: string }>(`/api/v1/library/${gameId}/download/${buildId}`, token);
+      window.location.href = res.url;
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (!user) return null;
+
+  return (
+    <div className="grid gap-5">
+      <h1 className="text-2xl font-extrabold">{t('library.title')}</h1>
+      {items.length === 0 && <p className="surface p-6 text-sm opacity-60">{t('library.empty')}</p>}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((e) => (
+          <div key={e.id} className="surface p-4">
+            <Link to={`/games/${e.game.slug}`} className="font-bold hover:underline">{e.game.title}</Link>
+            <p className="text-xs opacity-60">{e.game.genre}</p>
+            <GameBuildButtons gameId={e.game.id} slug={e.game.slug} busy={busy} onDownload={download} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GameBuildButtons({ gameId, slug, busy, onDownload }: { gameId: string; slug: string; busy: string | null; onDownload: (gameId: string, buildId: string) => void }) {
+  const { t } = useTranslation();
+  const [builds, setBuilds] = useState<{ id: string; platform: string; demo: boolean }[]>([]);
+
+  useEffect(() => {
+    void apiGet<{ versions: { builds: { id: string; platform: string; demo: boolean }[] }[] }>(`/api/v1/games/${slug}`)
+      .then((g) => setBuilds(g.versions.flatMap((v) => v.builds).filter((b) => !b.demo)))
+      .catch(() => setBuilds([]));
+  }, [slug]);
+
+  if (builds.length === 0) return null;
+  return (
+    <div className="mt-3 grid gap-1.5">
+      {builds.map((b) => (
+        <button key={b.id} type="button" disabled={busy === b.id} onClick={() => onDownload(gameId, b.id)}
+          className="surface px-3 py-1.5 text-xs disabled:opacity-50">
+          {busy === b.id ? '…' : `${t('library.download')} · ${b.platform}`}
+        </button>
+      ))}
     </div>
   );
 }

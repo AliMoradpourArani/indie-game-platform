@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { AdminDashboard, AdminSubmissionDetail } from './admin';
 import { AdminLoginPage, LoginPage, RegisterPage } from './authPages';
 import { DeveloperDashboard, DeveloperGameDetail } from './developer';
-import { BrowsePage, DeveloperPage, GamePage } from './games';
+import { BrowsePage, DeveloperPage, GamePage, LibraryPage } from './games';
 import { AdminLayout, PublicLayout } from './layouts';
 import { HomePage, PlaceholderPage } from './pages';
 
@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
       { path: '/browse', element: <BrowsePage /> },
       { path: '/games/:slug', element: <GamePage /> },
       { path: '/developers/:id', element: <DeveloperPage /> },
-      { path: '/library', element: <PlaceholderPage name="Library" /> },
+      { path: '/library', element: <LibraryPage /> },
       { path: '/developer', element: <DeveloperDashboard /> },
       { path: '/developer/games/:id', element: <DeveloperGameDetail /> },
       { path: '/login', element: <LoginPage /> },

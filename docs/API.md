@@ -46,11 +46,12 @@ GET  /admin/overview                        # moderation-first counts
 GET  /admin/audit?take=50                   # audit trail viewer
 POST /developer/games/:id/publish           # APPROVED→PUBLISHED
 
-# Purchases, library, downloads (Phase 6)
-POST /purchases/checkout {gameId} + Idempotency-Key → {checkoutId}
+# Purchases, library, downloads (Phase 6) ✅
+POST /purchases/checkout {gameId} + Idempotency-Key → {purchase, checkoutId|null}
 POST /purchases/confirm {checkoutId}        # backend verifies with provider
 GET  /library                               # entitlements
-GET  /library/:gameId/download/:buildId → {url}  # short-lived signed token
+GET  /library/:gameId/download/:buildId → {url}  # short-lived token (demo open, full gated)
+GET  /files/:token                          # streams bytes (attachment)
 ```
 
 ##paid-game file protection

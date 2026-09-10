@@ -49,10 +49,16 @@
   "game": {
     "demo": "Download demo",
     "buy": "Purchase",
-    "purchaseHint": "Purchases and library downloads land in Phase 6.",
+    "claim": "Add to library",
+    "purchaseHint": "Local test checkout — no real money moves in this environment.",
     "media": "Media",
     "requirements": "System requirements",
     "versions": "Version history"
+  },
+  "library": {
+    "title": "My library",
+    "empty": "Nothing here yet — browse games and purchase or claim one.",
+    "download": "Download"
   },
   "dev": {
     "myGames": "My games",

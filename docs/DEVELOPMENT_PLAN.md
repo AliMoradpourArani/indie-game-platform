@@ -63,10 +63,18 @@ project brief (§48). Never claim completion with missing parts.
       developer profile pages; responsive card grids
 - [x] Purchase/library buttons present but inert (wired in Phase 6)
 
-## Phase 6 — Purchases & Library
+## Phase 6 — Purchases & Library ✅
 
-- Orders + local test payments (idempotent, backend-verified), entitlements,
-  library, controlled downloads (signed local tokens)
+- [x] Checkout (idempotent via `Idempotency-Key`) + confirm (provider-verified,
+      never frontend-declared) + free-game instant grant
+- [x] Entitlements separate from purchases (`userId+gameId` unique; refunds revoke
+      access, history preserved); every grant audit-logged
+- [x] Library API + controlled downloads: demos open on published games, full
+      builds entitlement-gated, short-lived HMAC tokens, bytes stream from
+      storage (never a public dir)
+- [x] Tests: provider idempotency unit + DB-gated journey (deny→demo→checkout→
+      retry→confirm→library→allow, free grant)
+- [x] Frontend: purchase/claim flow on game page, library with per-platform downloads
 
 ## Phase 7 — UI/UX Refinement
 
