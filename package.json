@@ -1,0 +1,15 @@
+{
+  "name": "indie-game-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Modern local-first platform for independent game developers.",
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev:db": "docker compose up -d db",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

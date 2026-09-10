@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+coverage/
+
+# Env & secrets (never commit real secrets)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Local uploads & dev data (binaries live outside git)
+storage/
+uploads/
+media/
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.exe
+*.msi
+*.dmg
+*.AppImage
+*.iso
+
+# DB
+*.sqlite
+*.sqlite-journal
+pgdata/
+
+# Prisma
+prisma/migrations/dev/
+
+# Temp
+tmp/
+temp/
+*.tmp
+*.bak
