@@ -4,7 +4,9 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { loadConfig } from './config/env.js';
 import { errorHandler, notFound, requestId, requestLogger } from './common/middleware.js';
+import { authRouter } from './modules/auth/routes.js';
 import { healthRouter } from './modules/health/routes.js';
+import { usersRouter } from './modules/users/routes.js';
 
 export function createApp(): express.Express {
   const config = loadConfig();
@@ -26,6 +28,8 @@ export function createApp(): express.Express {
   );
 
   app.use('/api/v1', healthRouter());
+  app.use('/api/v1', authRouter());
+  app.use('/api/v1', usersRouter());
   void config;
 
   app.use(notFound);

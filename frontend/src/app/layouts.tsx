@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router-dom';
 import { applyLocale, type Locale } from '../i18n/config';
+import { useAuth } from './auth';
 import { useTheme } from './useTheme';
 
 function Controls() {
@@ -36,6 +37,7 @@ function Controls() {
 
 export function PublicLayout() {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4">
       <header className="flex items-center justify-between py-4">
@@ -43,8 +45,14 @@ export function PublicLayout() {
           <Link to="/" className="text-base font-bold">◈ Indie</Link>
           <Link to="/">{t('nav.home')}</Link>
           <Link to="/browse">{t('nav.browse')}</Link>
-          <Link to="/library">{t('nav.library')}</Link>
-          <Link to="/developer">{t('nav.dashboard')}</Link>
+          {user && <Link to="/library">{t('nav.library')}</Link>}
+          {user?.role === 'DEVELOPER' && <Link to="/developer">{t('nav.dashboard')}</Link>}
+          {!user && <Link to="/login">{t('nav.login')}</Link>}
+          {user && (
+            <button type="button" onClick={logout} className="opacity-70 hover:opacity-100">
+              {t('nav.logout')} ({user.profile?.displayName ?? user.email})
+            </button>
+          )}
         </nav>
         <Controls />
       </header>

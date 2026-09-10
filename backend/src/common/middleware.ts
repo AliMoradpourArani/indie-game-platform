@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
+import { ZodError } from 'zod';
 import { AppError } from './errors.js';
 import { logger } from './logger.js';
 
@@ -33,6 +34,15 @@ export function notFound(_req: Request, res: Response): void {
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
   if (err instanceof AppError) {
     res.status(err.status).json({ error: { code: err.code, message: err.message } });
+    return;
+  }
+  if (err instanceof ZodError) {
+    res.status(422).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: err.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '),
+      },
+    });
     return;
   }
   logger.error({ err, requestId: (req as { requestId?: string }).requestId }, 'Unhandled error');

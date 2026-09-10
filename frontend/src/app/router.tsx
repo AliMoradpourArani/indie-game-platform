@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { AdminLoginPage, LoginPage, RegisterPage } from './authPages';
 import { AdminLayout, PublicLayout } from './layouts';
-import { AdminLoginPage, HomePage, PlaceholderPage } from './pages';
+import { HomePage, PlaceholderPage } from './pages';
 
 export const router = createBrowserRouter([
   {
@@ -11,7 +12,8 @@ export const router = createBrowserRouter([
       { path: '/games/:slug', element: <PlaceholderPage name="Game" /> },
       { path: '/library', element: <PlaceholderPage name="Library" /> },
       { path: '/developer', element: <PlaceholderPage name="Developer dashboard" /> },
-      { path: '/login', element: <PlaceholderPage name="Login" /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
       { path: '/about', element: <PlaceholderPage name="About" /> },
       { path: '/rules', element: <PlaceholderPage name="Rules" /> },
       { path: '/privacy', element: <PlaceholderPage name="Privacy" /> },
@@ -21,6 +23,9 @@ export const router = createBrowserRouter([
   {
     path: '/admin',
     element: <AdminLayout />,
-    children: [{ path: 'login', element: <AdminLoginPage /> }],
+    children: [
+      { path: 'login', element: <AdminLoginPage /> },
+      { path: '', element: <PlaceholderPage name="Admin dashboard" /> },
+    ],
   },
 ]);

@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Home", "browse": "Browse", "library": "Library", "dashboard": "Developer", "login": "Log in" },
+  "nav": { "home": "Home", "browse": "Browse", "library": "Library", "dashboard": "Developer", "login": "Log in", "logout": "Log out" },
   "hero": {
     "title": "Independent games, direct from their creators",
     "subtitle": "Discover, demo, and own games built by indie developers.",
@@ -13,7 +13,22 @@
     "copyright": "© 2026 Indie Game Platform",
     "admin": "Admin"
   },
-  "admin": { "loginTitle": "Admin sign in", "email": "Email", "password": "Password", "submit": "Sign in" },
+  "admin": { "loginTitle": "Admin sign in", "email": "Email", "password": "Password", "submit": "Sign in", "notAdmin": "This account is not an administrator." },
+  "auth": {
+    "loginTitle": "Log in",
+    "loginSubmit": "Log in",
+    "registerTitle": "Create account",
+    "registerSubmit": "Create account",
+    "email": "Email",
+    "password": "Password (min 8 characters)",
+    "displayName": "Display name",
+    "studioName": "Studio name",
+    "accountType": "Account type",
+    "player": "Player",
+    "developer": "Game developer",
+    "noAccount": "No account yet?",
+    "genericError": "Something went wrong. Please try again."
+  },
   "theme": { "light": "Light", "dark": "Dark" },
   "lang": { "label": "Language" },
   "placeholder": { "title": "Coming in a later phase", "body": "This screen is a Phase 1 placeholder. The real feature lands in its planned phase." },

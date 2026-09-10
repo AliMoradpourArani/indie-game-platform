@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 1 — Architecture & Infrastructure ✅ → moving to Phase 2 (Authentication)
+- **Phase:** 2 — Authentication ✅ → moving to Phase 3 (Game Domain)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -30,10 +30,15 @@
       keys, download tokens, health); `tsc` clean; server boots, health 200
 - [x] Phase 1: frontend shell builds + serves 200 (router, theme dark/light,
       i18n en/fa + RTL, public layout + footer Admin link, `/admin/login`)
+- [x] Phase 2: auth backend (register/login/logout/me, bcrypt-12, JWT, Zod 422 map,
+      requireAuth/requireRole/requireAdmin, auth rate-limit) + frontend
+      (AuthProvider, login/register/admin pages, role-aware nav, en/fa auth strings)
+- [x] Phase 2: 17/17 runnable backend tests green (2 DB journey tests skip without
+      `TEST_DATABASE_URL`); `tsc` clean; both apps build
 
 ## In progress
 
-- Phase 2 scaffolding: authentication (register/login/logout, RBAC, admin guard)
+- Phase 3 scaffolding: game domain (games, versions, builds, media, drafts)
 
 ## Broken / blockers
 

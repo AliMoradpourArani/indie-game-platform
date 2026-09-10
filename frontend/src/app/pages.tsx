@@ -46,24 +46,3 @@ export function PlaceholderPage({ name }: { name: string }) {
     </section>
   );
 }
-
-export function AdminLoginPage() {
-  const { t } = useTranslation();
-  return (
-    <section className="surface mx-auto w-full max-w-md p-8">
-      <h1 className="text-xl font-bold">{t('admin.loginTitle')}</h1>
-      <form className="mt-4 grid gap-3" onSubmit={(e) => e.preventDefault()}>
-        <label className="grid gap-1 text-sm">
-          {t('admin.email')}
-          <input type="email" required className="surface px-3 py-2" placeholder="admin@local.test" />
-        </label>
-        <label className="grid gap-1 text-sm">
-          {t('admin.password')}
-          <input type="password" required className="surface px-3 py-2" />
-        </label>
-        <button type="submit" className="btn-accent px-4 py-2 text-sm">{t('admin.submit')}</button>
-      </form>
-      <p className="mt-3 text-xs opacity-60">{t('placeholder.body')}</p>
-    </section>
-  );
-}

@@ -23,12 +23,14 @@ project brief (§48). Never claim completion with missing parts.
   public layout + footer `Admin` link, `/admin/login` placeholder
 - [ ] `npm run dev` for both apps documented and verified
 
-## Phase 2 — Authentication
+## Phase 2 — Authentication ✅
 
-- Register (PLAYER/DEVELOPER choice), login, logout, me/profile
-- Password hashing (argon2/bcrypt), JWT, RBAC guards (backend-enforced)
-- Separate admin login (`/admin/login`) + admin guard
-- Tests: auth integration (register→login→guarded route→logout)
+- [x] Register (PLAYER/DEVELOPER choice; ADMIN never via public endpoint), login, logout, me/profile
+- [x] Password hashing (bcryptjs cost 12; argon2 upgrade path behind `password.ts`), JWT, RBAC guards (backend-enforced)
+- [x] Separate admin login (`/admin/login`) + `requireAdmin` guard; UI refuses non-admins, API enforces
+- [x] Tests: unit (hash/JWT/validation, 4 new) + DB-gated integration journey
+      (register→login→me→logout, duplicate 409, developer profile) — runs with `TEST_DATABASE_URL`
+- [x] Frontend: AuthProvider, login/register/admin pages, role-aware nav, en/fa strings
 
 ## Phase 3 — Game Domain
 
