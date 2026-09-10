@@ -4,7 +4,7 @@
 
 ## Current
 
-- **Phase:** 0 — Project Foundation → moving to Phase 1
+- **Phase:** 1 — Architecture & Infrastructure ✅ → moving to Phase 2 (Authentication)
 - **Date:** 2026-09-10
 - **Repo:** https://github.com/AliMoradpourArani/indie-game-platform
 - **Stack (decided, ADR-008/009):** Backend Node+TS+Express+Prisma+Postgres;
@@ -19,15 +19,28 @@
       DATABASE, API, SECURITY, DECISIONS, TESTING, LOCAL_SETUP, PROJECT_STATUS)
 - [x] README, `.gitignore`, `.env.example`, `docker-compose.yml` (Postgres 16)
 - [x] Initial monorepo layout (`backend/`, `frontend/`, `storage/`)
+- [x] Phase 1: backend skeleton (Express app factory, `/api/v1/health|ready`,
+      Zod env config, pino logging, helmet/CORS/rate-limit, central error map)
+- [x] Phase 1: Prisma schema (13 models) validated + migration SQL rendered +
+      client generates; seed script written
+- [x] Phase 1: `StorageService`/`LocalStorageService` (traversal-safe keys),
+      `PaymentProvider`/`LocalTestPaymentProvider` (idempotent),
+      `LogMailer`, `InlineJobRunner`, HMAC download tokens
+- [x] Phase 1: 13/13 backend tests green (state machine, entitlements, storage
+      keys, download tokens, health); `tsc` clean; server boots, health 200
+- [x] Phase 1: frontend shell builds + serves 200 (router, theme dark/light,
+      i18n en/fa + RTL, public layout + footer Admin link, `/admin/login`)
 
 ## In progress
 
-- Phase 1 scaffolding: backend app factory + health, Prisma schema + seed,
-  storage/payment abstractions, frontend shell (theme/i18n/router)
+- Phase 2 scaffolding: authentication (register/login/logout, RBAC, admin guard)
 
 ## Broken / blockers
 
-- None. (PostgreSQL CLI `psql` not on PATH locally — Docker Compose is the path.)
+- None. Local live-DB run deferred by owner decision (2026-09-10): migrations/seed
+  are validated via `prisma validate` + `migrate diff`; live run via
+  `docker compose up -d db` on a machine with Docker. No Docker/Postgres/winget
+  server package in this environment.
 
 ## Next recommended task
 

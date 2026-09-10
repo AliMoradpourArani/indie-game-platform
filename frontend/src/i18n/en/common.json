@@ -1,0 +1,21 @@
+{
+  "nav": { "home": "Home", "browse": "Browse", "library": "Library", "dashboard": "Developer", "login": "Log in" },
+  "hero": {
+    "title": "Independent games, direct from their creators",
+    "subtitle": "Discover, demo, and own games built by indie developers.",
+    "cta": "Browse games"
+  },
+  "footer": {
+    "about": "About",
+    "rules": "Rules",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "copyright": "© 2026 Indie Game Platform",
+    "admin": "Admin"
+  },
+  "admin": { "loginTitle": "Admin sign in", "email": "Email", "password": "Password", "submit": "Sign in" },
+  "theme": { "light": "Light", "dark": "Dark" },
+  "lang": { "label": "Language" },
+  "placeholder": { "title": "Coming in a later phase", "body": "This screen is a Phase 1 placeholder. The real feature lands in its planned phase." },
+  "health": { "backend": "Backend status" }
+}

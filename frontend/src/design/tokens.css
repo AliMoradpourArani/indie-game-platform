@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Design tokens — single source of truth for light/dark. Components use these
+   variables (plus Tailwind utilities for layout), never hardcoded colors. */
+:root {
+  --bg: #fafaf9;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f0efed;
+  --ink: #1c1917;
+  --ink-muted: #78716c;
+  --line: #e7e5e4;
+  --accent: #7c3aed;
+  --accent-ink: #ffffff;
+  --accent-soft: #ede9fe;
+  --danger: #dc2626;
+  --radius: 0.9rem;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0c0a09;
+  --bg-raised: #1c1917;
+  --bg-sunken: #292524;
+  --ink: #f5f5f4;
+  --ink-muted: #a8a29e;
+  --line: #292524;
+  --accent: #a78bfa;
+  --accent-ink: #0c0a09;
+  --accent-soft: #2e1065;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  margin: 0;
+  font-family: "Vazirmatn", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* Persian typography nicety: slightly roomier line-height under RTL. */
+[dir="rtl"] body {
+  line-height: 1.9;
+}
+
+.surface {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
