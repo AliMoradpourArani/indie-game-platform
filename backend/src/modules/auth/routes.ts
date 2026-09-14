@@ -10,8 +10,17 @@ import { loginSchema, registerSchema } from './validation.js';
 const strictAuthLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 60, // brute-force protection on credential endpoints
+  skipSuccessfulRequests: true,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({
+      error: {
+        code: 'TOO_MANY_REQUESTS',
+        message: 'Too many authentication attempts. Please try again in 15 minutes.',
+      },
+    });
+  },
 });
 
 function deps() {

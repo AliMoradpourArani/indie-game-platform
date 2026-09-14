@@ -169,6 +169,10 @@ export function gamesRouter(): Router {
         res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Media not found' } });
         return;
       }
+      if (item.storageKey.startsWith('http://') || item.storageKey.startsWith('https://')) {
+        res.redirect(item.storageKey);
+        return;
+      }
       const d = deps();
       const stream = await d.storage.get(item.storageKey);
       res.setHeader('Cache-Control', 'public, max-age=3600');

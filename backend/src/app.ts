@@ -14,6 +14,17 @@ import { purchasesRouter } from './modules/purchases/routes.js';
 import { submissionsRouter } from './modules/submissions/routes.js';
 import { usersRouter } from './modules/users/routes.js';
 
+// Allow BigInt serialization for Prisma BigInt fields (e.g. GameBuild.sizeBytes)
+if (!('toJSON' in BigInt.prototype)) {
+  Object.defineProperty(BigInt.prototype, 'toJSON', {
+    value: function () {
+      return Number(this);
+    },
+    writable: true,
+    configurable: true,
+  });
+}
+
 export function createApp(): express.Express {
   const config = loadConfig();
   const app = express();
@@ -27,9 +38,17 @@ export function createApp(): express.Express {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      limit: 300,
+      limit: config.NODE_ENV === 'production' ? 1000 : 10000,
       standardHeaders: 'draft-7',
       legacyHeaders: false,
+      handler: (_req, res) => {
+        res.status(429).json({
+          error: {
+            code: 'TOO_MANY_REQUESTS',
+            message: 'Too many requests, please try again later.',
+          },
+        });
+      },
     }),
   );
 

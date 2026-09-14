@@ -62,6 +62,7 @@ export function PublicLayout() {
           <Link to="/browse" onClick={() => setMenuOpen(false)}>{t('nav.browse')}</Link>
           {user && <Link to="/library" onClick={() => setMenuOpen(false)}>{t('nav.library')}</Link>}
           {user?.role === 'DEVELOPER' && <Link to="/developer" onClick={() => setMenuOpen(false)}>{t('nav.dashboard')}</Link>}
+          {user?.role === 'ADMIN' && <Link to="/admin" onClick={() => setMenuOpen(false)} className="font-semibold">{t('nav.admin')}</Link>}
           {!user && <Link to="/login" onClick={() => setMenuOpen(false)}>{t('nav.login')}</Link>}
           {user && (
             <button type="button" onClick={logout} className="opacity-70 hover:opacity-100 sm:text-sm">

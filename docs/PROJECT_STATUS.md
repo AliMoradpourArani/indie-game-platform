@@ -61,27 +61,28 @@
       both apps build clean
 - [x] Phase 9: `docs/PRODUCTION.md` (Stage-1 target, checklists, runbooks, launch
       gate). No cloud deploy — not requested; no premature infrastructure.
+- [x] UX consistency pass merged (PR #1): strict portals, error popup, admin links,
+      theme toggle, game page, comments/ratings/discounts.
+- [x] Stabilization & Bug Fixes:
+      - Live Prisma migration `20260914000000_ux_archive_feedback` applied to DB.
+      - Resolved API 500 on `/developer/games`: added missing `isArchived` column in DB.
+      - Fixed ErrorModalProvider infinite re-render loop on popup dismiss (stable context actions).
+      - BigInt serialization fix: added `BigInt.prototype.toJSON` and mapped builds in `getPublicGame`.
+      - Resolved API 429 lockout: increased dev rate limits, added `skipSuccessfulRequests` on auth limiter, added JSON error handler, fixed client retry loop.
+      - Admin navigation: added direct link to Admin Dashboard in primary navbar for admin users (en/fa).
+      - Seeded 6 rich showcase games with full details, artwork, multi-platform builds, reviews, and discount codes.
+      - Added MIT License and comprehensive open-source README.
 
 ## In progress
 
-- None. Next: run the DB-gated tests + seed on a Docker machine
-  (`docker compose up -d db`, `npm run db:migrate`, `npm run db:seed`, `TEST_DATABASE_URL=… npm test`),
-  then browser E2E per `TESTING.md` §5.
+- None. All tasks and test scenarios verified.
 
 ## Broken / blockers
 
-- None. Local live-DB run deferred by owner decision (2026-09-10): migrations/seed
-  are validated via `prisma validate` + `migrate diff`; live run via
-  `docker compose up -d db` on a machine with Docker. No Docker/Postgres/winget
-  server package in this environment.
-
-## Next recommended task
-
-1. Finish Phase 1 backend skeleton and verify `GET /api/v1/health` + `npm test` green.
-2. Then Phase 1 frontend shell and verify `npm run dev` on both apps.
-3. Commit as `feat: phase 1 architecture and infrastructure foundation`.
+- None. Database migrated and seeded, all tests green, frontend builds clean.
 
 ## Git
 
-- Latest commit: (to be recorded after Phase 0 push)
-- Branch: `main`, remote `origin` → GitHub (push after each phase)
+- Latest commit: (to be recorded after PR merge)
+- Branch: `fix/dev-games-500-rate-limit-admin-nav`, remote `origin`
+

@@ -1,20 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /* ---------- Error popup (replaces error pages) ---------- */
 
-interface ErrorState {
-  message: string | null;
+interface ErrorActions {
   show: (message: string) => void;
   clear: () => void;
 }
 
-const ErrorCtx = createContext<ErrorState>({ message: null, show: () => undefined, clear: () => undefined });
+const ErrorActionsCtx = createContext<ErrorActions>({ show: () => undefined, clear: () => undefined });
 
 export function ErrorModalProvider({ children }: { children: ReactNode }) {
   const [message, setMessage] = useState<string | null>(null);
   const show = useCallback((m: string) => setMessage(m), []);
   const clear = useCallback(() => setMessage(null), []);
+  const actions = useMemo(() => ({ show, clear }), [show, clear]);
 
   useEffect(() => {
     if (!message) return;
@@ -28,7 +28,7 @@ export function ErrorModalProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
 
   return (
-    <ErrorCtx.Provider value={{ message, show, clear }}>
+    <ErrorActionsCtx.Provider value={actions}>
       {children}
       {message && (
         <div className="modal-backdrop" role="alertdialog" aria-modal="true" aria-label={t('errorPopup.title')} onClick={clear}>
@@ -42,12 +42,12 @@ export function ErrorModalProvider({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
-    </ErrorCtx.Provider>
+    </ErrorActionsCtx.Provider>
   );
 }
 
-export function useErrorPopup(): ErrorState {
-  return useContext(ErrorCtx);
+export function useErrorPopup(): ErrorActions {
+  return useContext(ErrorActionsCtx);
 }
 
 /* ---------- Confirm popup (delete/archive) ---------- */

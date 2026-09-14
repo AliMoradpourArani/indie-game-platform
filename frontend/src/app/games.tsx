@@ -33,10 +33,18 @@ export function priceLabel(priceCents: number, t: (k: string) => string): string
 export function GameCard({ game }: { game: CardGame }) {
   const { t } = useTranslation();
   const studio = game.developer?.developerProfile?.studioName ?? game.developer?.profile?.displayName;
+  const coverUrl = game.coverKey?.startsWith('http') || game.coverKey?.startsWith('/')
+    ? game.coverKey
+    : null;
+
   return (
     <Link to={`/games/${game.slug}`} className="surface block overflow-hidden transition-transform hover:-translate-y-0.5">
-      <div className="flex h-32 items-center justify-center text-4xl" style={{ background: 'var(--bg-sunken)' }}>
-        ◈
+      <div className="flex h-36 items-center justify-center overflow-hidden" style={{ background: 'var(--bg-sunken)' }}>
+        {coverUrl ? (
+          <img src={coverUrl} alt={game.title} loading="lazy" className="h-full w-full object-cover" />
+        ) : (
+          <span className="text-4xl opacity-50">◈</span>
+        )}
       </div>
       <div className="p-4">
         <h3 className="truncate font-bold">{game.title}</h3>
@@ -123,6 +131,7 @@ interface GameDetail {
   tags: string[];
   priceCents: number;
   currency: string;
+  coverKey?: string | null;
   versions: { id: string; version: string; changelog: string; requirements: Record<string, string> | null; builds: { id: string; platform: string; demo: boolean }[] }[];
   media: { id: string; kind: string; storageKey: string }[];
   developer: { id: string; profile?: { displayName: string } | null; developerProfile?: { studioName: string; verified: boolean } | null };
@@ -254,10 +263,23 @@ export function GamePage() {
   const demoBuild = game.versions.flatMap((v) => v.builds).find((b) => b.demo);
   const screenshots = game.media.filter((m) => m.kind === 'SCREENSHOT' || m.kind === 'COVER');
 
+  const coverMedia = game.media.find((m) => m.kind === 'COVER');
+  const coverUrl = game.coverKey?.startsWith('http') || game.coverKey?.startsWith('/')
+    ? game.coverKey
+    : coverMedia
+      ? (coverMedia.storageKey?.startsWith('http') ? coverMedia.storageKey : `/api/v1/games/${game.slug}/media/${coverMedia.id}`)
+      : null;
+
   return (
     <article className="grid gap-6">
       <div className="surface overflow-hidden">
-        <div className="flex h-56 items-center justify-center text-6xl" style={{ background: 'var(--bg-sunken)' }}>◈</div>
+        <div className="flex h-64 sm:h-80 items-center justify-center overflow-hidden relative" style={{ background: 'var(--bg-sunken)' }}>
+          {coverUrl ? (
+            <img src={coverUrl} alt={game.title} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-6xl opacity-50">◈</span>
+          )}
+        </div>
         <div className="p-6 sm:p-8">
           <p className="text-xs opacity-60">{game.genre} · v{latest?.version ?? '—'}</p>
           <h1 className="mt-1 text-3xl font-extrabold sm:text-4xl">{game.title}</h1>
@@ -291,26 +313,29 @@ export function GamePage() {
         <h2 className="font-bold">{t('game.screenshots')}</h2>
         {screenshots.length === 0 && <p className="surface mt-2 p-4 text-sm opacity-60">{t('game.media')}</p>}
         <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {screenshots.map((m, i) => (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => setLightbox(`/api/v1/games/${game.slug}/media/${m.id}`)}
-              className="surface overflow-hidden text-start"
-              aria-label={`${t('game.screenshots')} ${i + 1}`}
-            >
-              <img
-                src={`/api/v1/games/${game.slug}/media/${m.id}`}
-                alt={`${game.title} ${i + 1}`}
-                loading="lazy"
-                className="h-24 w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-              <span className="block px-2 py-1 text-xs opacity-60">{m.kind}</span>
-            </button>
-          ))}
+          {screenshots.map((m, i) => {
+            const src = m.storageKey?.startsWith('http') ? m.storageKey : `/api/v1/games/${game.slug}/media/${m.id}`;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => setLightbox(src)}
+                className="surface overflow-hidden text-start group transition-transform hover:-translate-y-0.5"
+                aria-label={`${t('game.screenshots')} ${i + 1}`}
+              >
+                <img
+                  src={src}
+                  alt={`${game.title} ${i + 1}`}
+                  loading="lazy"
+                  className="h-28 w-full object-cover transition-transform group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                <span className="block px-2 py-1 text-xs opacity-60">{m.kind}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
