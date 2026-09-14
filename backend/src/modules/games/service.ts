@@ -156,6 +156,13 @@ export async function getPublicGame(deps: Pick<Deps, 'db'>, slug: string) {
 
   return {
     ...game,
+    versions: game.versions.map((v) => ({
+      ...v,
+      builds: v.builds.map((b) => ({
+        ...b,
+        sizeBytes: Number(b.sizeBytes),
+      })),
+    })),
     purchaseCount,
     demoPlays,
     ratingAverage: ratingAgg._avg.stars ?? 0,

@@ -10,7 +10,10 @@ function headers(token?: string): HeadersInit {
 
 export async function apiGet<T>(path: string, token?: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { headers: headers(token) });
-  if (!res.ok) throw new ApiError(res.status, path);
+  if (!res.ok) {
+    const detail = await res.json().catch(() => null);
+    throw new ApiError(res.status, path, detail?.error?.message);
+  }
   return res.json() as Promise<T>;
 }
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../app/auth';
@@ -133,6 +133,13 @@ export function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
+  // If already authenticated as ADMIN, go straight to dashboard.
+  useEffect(() => {
+    if (user?.role === 'ADMIN') {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, navigate]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -157,7 +164,12 @@ export function AdminLoginPage() {
       <Link to="/" className="text-sm underline opacity-70 hover:opacity-100">← {t('adminS.backToSite')}</Link>
       <h1 className="mt-2 text-xl font-bold">{t('admin.loginTitle')}</h1>
       {user && user.role !== 'ADMIN' && (
-        <p className="mt-2 text-xs opacity-60">{t('admin.wrongPortal')}</p>
+        <div className="mt-3 surface flex items-center justify-between gap-2 p-3 text-xs" style={{ borderColor: 'var(--line)' }}>
+          <p className="opacity-80">{t('admin.wrongPortal')}</p>
+          <button type="button" onClick={logout} className="font-semibold underline">
+            {t('nav.logout')}
+          </button>
+        </div>
       )}
       <form className="mt-4 grid gap-3" onSubmit={submit}>
         <label className="grid gap-1 text-sm">
