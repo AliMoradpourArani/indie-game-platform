@@ -138,7 +138,76 @@ export async function getPublicGame(deps: Pick<Deps, 'db'>, slug: string) {
     },
   });
   if (!game) throw Errors.notFound('Game not found');
+  if (game.isArchived) throw Errors.notFound('Game not found');
   const latest = game.submissions[0]?.state ?? null;
   if (latest !== 'PUBLISHED') throw Errors.notFound('Game not found');
-  return game;
+
+  const [purchaseCount, demoPlays, ratingAgg, comments] = await Promise.all([
+    deps.db.purchase.count({ where: { gameId: game.id, status: 'COMPLETED' } }),
+    deps.db.auditLog.count({ where: { entityType: 'build', entityId: { startsWith: `${game.id}:` }, action: 'demo.download' } }),
+    deps.db.gameRating.aggregate({ where: { gameId: game.id }, _avg: { stars: true }, _count: { stars: true } }),
+    deps.db.gameComment.findMany({
+      where: { gameId: game.id },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: { author: { select: { id: true, profile: { select: { displayName: true } } } } },
+    }),
+  ]);
+
+  return {
+    ...game,
+    purchaseCount,
+    demoPlays,
+    ratingAverage: ratingAgg._avg.stars ?? 0,
+    ratingCount: ratingAgg._count.stars ?? 0,
+    comments: comments.map((c) => ({
+      id: c.id,
+      body: c.body,
+      createdAt: c.createdAt,
+      author: c.author.profile?.displayName ?? 'Player',
+    })),
+  };
+}
+
+export async function archiveGame(deps: Deps, gameId: string, actorId: string, actorRole: string, ip?: string) {
+  const game = await deps.db.game.findUnique({ where: { id: gameId } });
+  if (!game) throw Errors.notFound('Game not found');
+  if (actorRole !== 'ADMIN' && game.developerId !== actorId) throw Errors.forbidden('Not your game');
+  const updated = await deps.db.game.update({
+    where: { id: gameId },
+    data: { isArchived: true, archivedAt: new Date() },
+  });
+  await deps.db.auditLog.create({
+    data: { actorId, action: 'game.archived', entityType: 'game', entityId: gameId, ip },
+  });
+  return updated;
+}
+
+export async function unarchiveGame(deps: Deps, gameId: string, actorId: string, actorRole: string, ip?: string) {
+  const game = await deps.db.game.findUnique({ where: { id: gameId } });
+  if (!game) throw Errors.notFound('Game not found');
+  if (actorRole !== 'ADMIN' && game.developerId !== actorId) throw Errors.forbidden('Not your game');
+  const updated = await deps.db.game.update({
+    where: { id: gameId },
+    data: { isArchived: false, archivedAt: null },
+  });
+  await deps.db.auditLog.create({
+    data: { actorId, action: 'game.unarchived', entityType: 'game', entityId: gameId, ip },
+  });
+  return updated;
+}
+
+/** Permanent deletion: admin only, reason required. Logged before cascade delete. */
+export async function deleteGame(deps: Deps, gameId: string, adminId: string, reason: string, ip?: string) {
+  if (!reason.trim()) throw Errors.validation('A reason for deletion is required');
+  const game = await deps.db.game.findUnique({ where: { id: gameId } });
+  if (!game) throw Errors.notFound('Game not found');
+  await deps.db.gameDeletionLog.create({
+    data: { gameId, title: game.title, reason: reason.trim(), deletedBy: adminId },
+  });
+  await deps.db.auditLog.create({
+    data: { actorId: adminId, action: 'game.deleted', entityType: 'game', entityId: gameId, diff: { title: game.title, reason: reason.trim() }, ip },
+  });
+  await deps.db.game.delete({ where: { id: gameId } });
+  return { ok: true };
 }

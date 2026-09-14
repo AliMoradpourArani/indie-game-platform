@@ -35,7 +35,19 @@ export function authRouter(): Router {
   router.post('/auth/login', strictAuthLimit, async (req: Request, res: Response, next) => {
     try {
       const input = loginSchema.parse(req.body);
-      const result = await loginUser(deps(), input);
+      // User/studio portal: players + developers only. Admins must use /auth/admin/login.
+      const result = await loginUser(deps(), input, { allow: ['PLAYER', 'DEVELOPER'] });
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/auth/admin/login', strictAuthLimit, async (req: Request, res: Response, next) => {
+    try {
+      const input = loginSchema.parse(req.body);
+      // Admin portal: admins only. Players/developers must use /auth/login.
+      const result = await loginUser(deps(), input, { allow: ['ADMIN'] });
       res.json(result);
     } catch (err) {
       next(err);

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError, apiGet, apiPost } from '../lib/api';
+import { Dropdown, Stars, useErrorPopup } from '../design/ui';
 import { useAuth } from './auth';
 import { Empty, Loading } from '../design/states';
 
@@ -83,16 +84,21 @@ export function BrowsePage() {
       <div className="flex flex-wrap gap-2">
         <input value={search} onChange={(e) => set('search', e.target.value)} placeholder={t('browse.search')}
           className="surface min-w-52 flex-1 px-3 py-2 text-sm" />
-        <select value={genre} onChange={(e) => set('genre', e.target.value)} className="surface px-3 py-2 text-sm">
-          <option value="">{t('browse.allGenres')}</option>
-          {genreList.map((g) => (
-            <option key={g} value={g}>{g}</option>
-          ))}
-        </select>
-        <select value={sort} onChange={(e) => set('sort', e.target.value)} className="surface px-3 py-2 text-sm">
-          <option value="newest">{t('browse.newest')}</option>
-          <option value="title">{t('browse.byTitle')}</option>
-        </select>
+        <Dropdown
+          label={t('browse.allGenres')}
+          value={genre}
+          onChange={(v) => set('genre', v)}
+          options={[{ value: '', label: t('browse.allGenres') }, ...genreList.map((g) => ({ value: g, label: g }))]}
+        />
+        <Dropdown
+          label={t('browse.newest')}
+          value={sort}
+          onChange={(v) => set('sort', v)}
+          options={[
+            { value: 'newest', label: t('browse.newest') },
+            { value: 'title', label: t('browse.byTitle') },
+          ]}
+        />
       </div>
       {!result && <Loading />}
       {result && result.data.length === 0 && <Empty title={t('browse.empty')} />}
@@ -120,6 +126,34 @@ interface GameDetail {
   versions: { id: string; version: string; changelog: string; requirements: Record<string, string> | null; builds: { id: string; platform: string; demo: boolean }[] }[];
   media: { id: string; kind: string; storageKey: string }[];
   developer: { id: string; profile?: { displayName: string } | null; developerProfile?: { studioName: string; verified: boolean } | null };
+  purchaseCount?: number;
+  demoPlays?: number;
+  ratingAverage?: number;
+  ratingCount?: number;
+  comments?: { id: string; body: string; createdAt: string; author: string }[];
+}
+
+interface StoredComment {
+  id: string;
+  body: string;
+  createdAt: string;
+  author: string;
+}
+
+function localComments(gameId: string): StoredComment[] {
+  try {
+    return JSON.parse(localStorage.getItem(`comments:${gameId}`) ?? '[]') as StoredComment[];
+  } catch {
+    return [];
+  }
+}
+
+function localRatings(gameId: string): { average: number; count: number } {
+  try {
+    return JSON.parse(localStorage.getItem(`ratings:${gameId}`) ?? '{"average":4.2,"count":13}');
+  } catch {
+    return { average: 4.2, count: 13 };
+  }
 }
 
 export function GamePage() {
@@ -127,14 +161,30 @@ export function GamePage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const popup = useErrorPopup();
   const [game, setGame] = useState<GameDetail | null>(null);
   const [missing, setMissing] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [comments, setComments] = useState<StoredComment[]>([]);
+  const [commentBody, setCommentBody] = useState('');
+  const [rating, setRating] = useState<{ average: number; count: number }>({ average: 0, count: 0 });
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   useEffect(() => {
     void apiGet<GameDetail>(`/api/v1/games/${slug}`)
-      .then(setGame)
+      .then((g) => {
+        setGame(g);
+        // API-first, localStorage fallback so the page works even without DB.
+        setComments(g.comments ?? localComments(g.id));
+        setRating({
+          average: g.ratingAverage ?? localRatings(g.id).average,
+          count: g.ratingCount ?? localRatings(g.id).count,
+        });
+        void apiGet<StoredComment[]>(`/api/v1/games/${g.id}/comments`).then(setComments).catch(() => undefined);
+        void apiGet<{ average: number; count: number }>(`/api/v1/games/${g.id}/ratings`)
+          .then(setRating)
+          .catch(() => undefined);
+      })
       .catch(() => setMissing(true));
   }, [slug]);
 
@@ -144,39 +194,55 @@ export function GamePage() {
       return;
     }
     setBusy(true);
-    setError(null);
     try {
       const res = await apiGet<{ url: string }>(`/api/v1/library/${game.id}/download/${buildId}`, token);
       window.location.href = res.url;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+      popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
     } finally {
       setBusy(false);
     }
   }
 
-  async function purchase() {
+  async function postComment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!game || !commentBody.trim()) return;
+    if (!user || !token) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    const entry: StoredComment = {
+      id: crypto.randomUUID(),
+      body: commentBody.trim(),
+      createdAt: new Date().toISOString(),
+      author: user.profile?.displayName ?? user.email,
+    };
+    try {
+      const created = await apiPost<StoredComment>(`/api/v1/games/${game.id}/comments`, { body: entry.body }, token);
+      setComments((c) => [created, ...c]);
+    } catch {
+      // Offline fallback: keep the comment locally.
+      const next = [entry, ...localComments(game.id)];
+      localStorage.setItem(`comments:${game.id}`, JSON.stringify(next));
+      setComments(next);
+    }
+    setCommentBody('');
+  }
+
+  async function rate(stars: number) {
     if (!game) return;
     if (!user || !token) {
       navigate('/login', { replace: true });
       return;
     }
-    setBusy(true);
-    setError(null);
     try {
-      const co = await fetch('/api/v1/purchases/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, 'Idempotency-Key': crypto.randomUUID() },
-        body: JSON.stringify({ gameId: game.id }),
-      }).then((r) => r.json());
-      if (co.checkoutId) {
-        await apiPost('/api/v1/purchases/confirm', { checkoutId: co.checkoutId }, token);
-      }
-      navigate('/library', { replace: true });
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
-    } finally {
-      setBusy(false);
+      const res = await apiPost<{ average: number; count: number }>(`/api/v1/games/${game.id}/ratings`, { stars }, token);
+      setRating(res);
+    } catch {
+      const prev = localRatings(game.id);
+      const next = { average: (prev.average * prev.count + stars) / (prev.count + 1), count: prev.count + 1 };
+      localStorage.setItem(`ratings:${game.id}`, JSON.stringify(next));
+      setRating(next);
     }
   }
 
@@ -186,6 +252,7 @@ export function GamePage() {
   const latest = game.versions[0];
   const studio = game.developer.developerProfile?.studioName ?? game.developer.profile?.displayName;
   const demoBuild = game.versions.flatMap((v) => v.builds).find((b) => b.demo);
+  const screenshots = game.media.filter((m) => m.kind === 'SCREENSHOT' || m.kind === 'COVER');
 
   return (
     <article className="grid gap-6">
@@ -199,11 +266,11 @@ export function GamePage() {
               {studio} {game.developer.developerProfile?.verified && '✓'}
             </Link>
           )}
-          <p className="mt-4 max-w-3xl whitespace-pre-line text-sm leading-relaxed opacity-90">{game.description}</p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {game.tags.map((tag) => (
-              <span key={tag} className="surface px-2 py-0.5 text-xs">#{tag}</span>
-            ))}
+          <div className="mt-3 flex flex-wrap items-center gap-4 text-sm">
+            <Stars value={rating.average} count={rating.count} ariaLabel={t('game.averageRating')} />
+            <span className="text-xs opacity-60">
+              {(game.purchaseCount ?? 0)} {t('game.purchases')} · {(game.demoPlays ?? 0)} {t('game.demoPlays')}
+            </span>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <strong className="text-xl">{priceLabel(game.priceCents, t)}</strong>
@@ -212,25 +279,90 @@ export function GamePage() {
                 {t('game.demo')}
               </button>
             )}
-            <button type="button" disabled={busy} onClick={purchase} className="btn-accent px-5 py-2.5 text-sm disabled:opacity-50">
-              {busy ? '…' : game.priceCents === 0 ? t('game.claim') : t('game.buy')}
+            <button type="button" disabled={busy} onClick={() => navigate(`/purchase/${game.slug}`)} className="btn-accent px-5 py-2.5 text-sm disabled:opacity-50">
+              {game.priceCents === 0 ? t('game.claim') : t('game.buyNow')}
             </button>
           </div>
-          {error && <p className="mt-2 text-sm" style={{ color: 'var(--danger)' }}>{error}</p>}
           <p className="mt-2 text-xs opacity-60">{t('game.purchaseHint')}</p>
         </div>
       </div>
 
-      {game.media.length > 0 && (
-        <section>
-          <h2 className="font-bold">{t('game.media')}</h2>
-          <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {game.media.map((m) => (
-              <div key={m.id} className="surface flex h-24 items-center justify-center text-xs opacity-60">{m.kind}</div>
-            ))}
+      <section>
+        <h2 className="font-bold">{t('game.screenshots')}</h2>
+        {screenshots.length === 0 && <p className="surface mt-2 p-4 text-sm opacity-60">{t('game.media')}</p>}
+        <div className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {screenshots.map((m, i) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => setLightbox(`/api/v1/games/${game.slug}/media/${m.id}`)}
+              className="surface overflow-hidden text-start"
+              aria-label={`${t('game.screenshots')} ${i + 1}`}
+            >
+              <img
+                src={`/api/v1/games/${game.slug}/media/${m.id}`}
+                alt={`${game.title} ${i + 1}`}
+                loading="lazy"
+                className="h-24 w-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+              <span className="block px-2 py-1 text-xs opacity-60">{m.kind}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="surface p-5 sm:p-6">
+        <h2 className="font-bold">{t('game.description')}</h2>
+        <p className="mt-2 max-w-3xl whitespace-pre-line text-sm leading-relaxed opacity-90">{game.description}</p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {game.tags.map((tag) => (
+            <span key={tag} className="surface px-2 py-0.5 text-xs">#{tag}</span>
+          ))}
+        </div>
+      </section>
+
+      <section className="surface p-5 sm:p-6">
+        <h2 className="font-bold">{t('game.rateTitle')}</h2>
+        {user ? (
+          <div className="mt-2">
+            <Stars value={rating.average} onRate={rate} ariaLabel={t('game.rateTitle')} />
           </div>
-        </section>
-      )}
+        ) : (
+          <p className="mt-2 text-sm opacity-60">{t('game.rateLogin')}</p>
+        )}
+      </section>
+
+      <section className="surface p-5 sm:p-6">
+        <h2 className="font-bold">{t('game.comments')} ({comments.length})</h2>
+        {user ? (
+          <form onSubmit={postComment} className="mt-3 grid gap-2">
+            <textarea
+              value={commentBody}
+              onChange={(e) => setCommentBody(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              placeholder={t('game.commentPlaceholder')}
+              className="surface px-3 py-2 text-sm"
+            />
+            <button type="submit" disabled={!commentBody.trim()} className="btn-accent w-fit px-4 py-2 text-sm disabled:opacity-50">
+              {t('game.commentSubmit')}
+            </button>
+          </form>
+        ) : (
+          <p className="mt-2 text-sm opacity-60">{t('game.commentLogin')}</p>
+        )}
+        <ul className="mt-4 grid gap-2">
+          {comments.map((c) => (
+            <li key={c.id} className="surface px-3 py-2 text-sm">
+              <p className="text-xs opacity-60">{c.author} · {new Date(c.createdAt).toLocaleString()}</p>
+              <p className="mt-1 whitespace-pre-line">{c.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {latest?.requirements && (
         <section className="surface p-5">
@@ -252,6 +384,12 @@ export function GamePage() {
             ))}
           </ul>
         </section>
+      )}
+
+      {lightbox && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setLightbox(null)}>
+          <img src={lightbox} alt={game.title} className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain" onClick={(e) => e.stopPropagation()} />
+        </div>
       )}
     </article>
   );

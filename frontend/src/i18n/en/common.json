@@ -13,7 +13,7 @@
     "copyright": "© 2026 Indie Game Platform",
     "admin": "Admin"
   },
-  "admin": { "loginTitle": "Admin sign in", "email": "Email", "password": "Password", "submit": "Sign in", "notAdmin": "This account is not an administrator." },
+  "admin": { "loginTitle": "Admin sign in", "email": "Email", "password": "Password", "submit": "Sign in", "notAdmin": "This account is not an administrator.", "wrongPortal": "Players and studios: please use the main log in page. Admins: use this portal." },
   "auth": {
     "loginTitle": "Log in",
     "loginSubmit": "Log in",
@@ -53,8 +53,20 @@
     "claim": "Add to library",
     "purchaseHint": "Local test checkout — no real money moves in this environment.",
     "media": "Media",
+    "screenshots": "Screenshots",
+    "description": "About this game",
     "requirements": "System requirements",
-    "versions": "Version history"
+    "versions": "Version history",
+    "comments": "Player comments",
+    "commentPlaceholder": "Share your thoughts about this game…",
+    "commentSubmit": "Post comment",
+    "commentLogin": "Log in to post a comment.",
+    "rateTitle": "Rate this game",
+    "rateLogin": "Log in to rate this game.",
+    "purchases": "purchases",
+    "demoPlays": "demo plays",
+    "buyNow": "Buy now",
+    "averageRating": "Average rating"
   },
   "library": {
     "title": "My library",
@@ -84,7 +96,12 @@
     "review": "Review status",
     "submit": "Submit for review",
     "withdraw": "Withdraw to draft",
-    "publish": "Publish"
+    "publish": "Publish",
+    "uploadCover": "Upload cover / screenshots",
+    "uploadHintNew": "PNG, JPEG, or WebP up to 5 MB. First upload becomes the cover.",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "archived": "Archived — hidden from the store"
   },
   "adminS": {
     "dashboard": "Admin dashboard",
@@ -104,6 +121,30 @@
     "reject": "Reject",
     "history": "Review history",
     "noReviews": "No reviews yet.",
-    "auditTrail": "Audit trail"
-  }
+    "auditTrail": "Audit trail",
+    "backToSite": "Back to site",
+    "games": "Games",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete permanently",
+    "deleteTitle": "Are you sure you want to delete this game?",
+    "deleteBody": "This permanently removes the game and its versions, builds, and media. A reason is required and stored in the deletion log.",
+    "deleteReason": "Reason for deletion (required)",
+    "deleteConfirm": "Yes, I am sure",
+    "cancel": "Cancel",
+    "archived": "Archived"
+  },
+  "purchase": {
+    "title": "Complete purchase",
+    "discount": "Discount code",
+    "discountPlaceholder": "Enter code (optional)",
+    "apply": "Apply",
+    "discountApplied": "Discount applied: {{percent}}% off",
+    "discountInvalid": "That code is invalid or expired.",
+    "total": "Total",
+    "confirm": "Confirm purchase",
+    "success": "Purchase complete — check your library!",
+    "loginRequired": "Log in to purchase this game."
+  },
+  "errorPopup": { "title": "Something went wrong", "ok": "OK" }
 }

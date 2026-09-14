@@ -12,8 +12,13 @@ export function useTheme(): { theme: Theme; toggle: () => void } {
   const [theme, setTheme] = useState<Theme>(initialTheme);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
+    const root = document.documentElement;
+    // Smooth cross-fade so the switch is never abrupt.
+    root.classList.add('theme-anim');
+    root.dataset.theme = theme;
     localStorage.setItem('theme', theme);
+    const t = window.setTimeout(() => root.classList.remove('theme-anim'), 500);
+    return () => window.clearTimeout(t);
   }, [theme]);
 
   return { theme, toggle: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')) };

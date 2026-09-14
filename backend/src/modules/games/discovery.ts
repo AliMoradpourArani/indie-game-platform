@@ -27,6 +27,7 @@ export async function browseGames(db: PrismaClient, q: BrowseQuery) {
 
   const where = {
     id: { in: ids },
+    isArchived: false,
     ...(q.genre ? { genre: q.genre } : {}),
     ...(q.tag ? { tags: { has: q.tag } } : {}),
     ...(q.search
@@ -43,7 +44,7 @@ export async function browseGames(db: PrismaClient, q: BrowseQuery) {
       take: q.pageSize,
       select: {
         id: true, slug: true, title: true, description: true, genre: true, tags: true,
-        priceCents: true, currency: true, coverKey: true, createdAt: true,
+        priceCents: true, currency: true, coverKey: true, createdAt: true, isArchived: true,
         developer: { select: { developerProfile: { select: { studioName: true } }, profile: { select: { displayName: true } } } },
       },
     }),

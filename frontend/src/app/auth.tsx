@@ -13,6 +13,7 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
+  adminLogin: (email: string, password: string) => Promise<AuthUser>;
   register: (input: { email: string; password: string; role: 'PLAYER' | 'DEVELOPER'; displayName: string; studioName?: string }) => Promise<AuthUser>;
   logout: () => void;
 }
@@ -52,6 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.user;
   }, []);
 
+  const adminLogin = useCallback(async (email: string, password: string) => {
+    const res = await apiPost<{ token: string; user: AuthUser }>('/api/v1/auth/admin/login', { email, password });
+    setToken(res.token);
+    setUser(res.user);
+    return res.user;
+  }, []);
+
   const register = useCallback(async (input: { email: string; password: string; role: 'PLAYER' | 'DEVELOPER'; displayName: string; studioName?: string }) => {
     const res = await apiPost<{ token: string; user: AuthUser }>('/api/v1/auth/register', input);
     setToken(res.token);
@@ -65,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ user, token, loading, login, register, logout }), [user, token, loading, login, register, logout]);
+  const value = useMemo(() => ({ user, token, loading, login, adminLogin, register, logout }), [user, token, loading, login, adminLogin, register, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

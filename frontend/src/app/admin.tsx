@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../app/auth';
-import { ApiError, apiGet, apiPost } from '../lib/api';
+import { ConfirmModal, useErrorPopup } from '../design/ui';
+import { ApiError, apiDelete, apiGet, apiPost } from '../lib/api';
 
 export interface QueueItem {
   id: string;
@@ -33,14 +34,22 @@ function useAdminGuard(): boolean {
 export function AdminDashboard() {
   const { t } = useTranslation();
   const { token } = useAuth();
+  const popup = useErrorPopup();
   const ready = useAdminGuard();
   const [overview, setOverview] = useState<Record<string, number> | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [games, setGames] = useState<{ id: string; title: string; slug: string; isArchived?: boolean }[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!ready || !token) return;
-    void apiGet<Record<string, number>>('/api/v1/admin/overview', token).then(setOverview);
-    void apiGet<QueueItem[]>('/api/v1/admin/submissions', token).then(setQueue);
+    void apiGet<Record<string, number>>('/api/v1/admin/overview', token).then(setOverview).catch(() => undefined);
+    void apiGet<QueueItem[]>('/api/v1/admin/submissions', token).then(setQueue).catch(() => undefined);
+    void apiGet<{ data: { id: string; title: string; slug: string; isArchived?: boolean }[] }>('/api/v1/games?pageSize=50', token)
+      .then((r) => setGames(r.data))
+      .catch(() => undefined);
   }, [ready, token]);
 
   if (!ready) return null;
@@ -53,9 +62,37 @@ export function AdminDashboard() {
     [t('adminS.users'), overview?.users],
   ];
 
+  async function toggleArchive(id: string, archived: boolean) {
+    if (!token) return;
+    try {
+      await apiPost(`/api/v1/admin/games/${id}/${archived ? 'unarchive' : 'archive'}`, {}, token);
+      setGames((g) => g.map((x) => (x.id === id ? { ...x, isArchived: !archived } : x)));
+    } catch (err) {
+      popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
+    }
+  }
+
+  async function confirmDelete() {
+    if (!token || !deleteTarget) return;
+    setBusy(true);
+    try {
+      await apiDelete(`/api/v1/admin/games/${deleteTarget.id}`, { reason: deleteReason }, token);
+      setGames((g) => g.filter((x) => x.id !== deleteTarget.id));
+      setDeleteTarget(null);
+      setDeleteReason('');
+    } catch (err) {
+      popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="grid gap-6">
-      <h1 className="text-2xl font-extrabold">{t('adminS.dashboard')}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-extrabold">{t('adminS.dashboard')}</h1>
+        <Link to="/" className="ms-auto text-sm underline opacity-70 hover:opacity-100">← {t('adminS.backToSite')}</Link>
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {cards.map(([label, value]) => (
           <div key={label} className="surface p-4 text-center">
@@ -83,6 +120,43 @@ export function AdminDashboard() {
           ))}
         </ul>
       </section>
+      <section>
+        <h2 className="font-bold">{t('adminS.games')} ({games.length})</h2>
+        <ul className="mt-2 grid gap-2">
+          {games.map((g) => (
+            <li key={g.id} className="surface flex flex-wrap items-center gap-2 p-3 text-sm">
+              <Link to={`/games/${g.slug}`} className="min-w-0 flex-1 truncate font-bold hover:underline">
+                {g.title} {g.isArchived && <span className="font-normal opacity-60">· {t('adminS.archived')}</span>}
+              </Link>
+              <button type="button" onClick={() => toggleArchive(g.id, !!g.isArchived)} className="surface px-3 py-1.5 text-xs font-semibold">
+                {g.isArchived ? t('adminS.unarchive') : t('adminS.archive')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setDeleteTarget({ id: g.id, title: g.title }); setDeleteReason(''); }}
+                className="surface px-3 py-1.5 text-xs font-semibold"
+                style={{ color: 'var(--danger)' }}
+              >
+                {t('adminS.delete')}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <ConfirmModal
+        open={!!deleteTarget}
+        title={t('adminS.deleteTitle')}
+        body={t('adminS.deleteBody')}
+        confirmLabel={t('adminS.deleteConfirm')}
+        cancelLabel={t('adminS.cancel')}
+        danger
+        busy={busy}
+        reasonRequired
+        reason={deleteReason}
+        onReasonChange={setDeleteReason}
+        onConfirm={confirmDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteReason(''); }}
+      />
     </div>
   );
 }
@@ -90,21 +164,21 @@ export function AdminDashboard() {
 export function AdminSubmissionDetail() {
   const { t } = useTranslation();
   const { token } = useAuth();
+  const popup = useErrorPopup();
   const ready = useAdminGuard();
   const { id } = useParams();
   const [data, setData] = useState<{ submission: { id: string; state: string; game: { title: string; slug: string }; version: { version: string }; reviews: HistoryReview[] }; trail: { action: string; createdAt: string }[] } | null>(null);
   const [comment, setComment] = useState('');
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!token || !id) return;
     try {
       setData(await apiGet(`/api/v1/admin/submissions/${id}/history`, token));
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+      popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
     }
-  }, [token, id, t]);
+  }, [token, id, t, popup]);
 
   useEffect(() => {
     if (ready) void load();
@@ -113,20 +187,18 @@ export function AdminSubmissionDetail() {
   async function act(path: string, body?: unknown) {
     if (!token || !id) return;
     setBusy(true);
-    setError(null);
     try {
       await apiPost(`/api/v1/admin/submissions/${id}/${path}`, body ?? {}, token);
       setComment('');
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : t('auth.genericError'));
+      popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
     } finally {
       setBusy(false);
     }
   }
 
   if (!ready) return null;
-  if (error) return <p className="text-sm" style={{ color: 'var(--danger)' }}>{error}</p>;
   if (!data) return <p className="text-sm opacity-60">…</p>;
 
   const { submission, trail } = data;
@@ -135,7 +207,10 @@ export function AdminSubmissionDetail() {
   return (
     <div className="grid gap-5">
       <div>
-        <Link to="/admin" className="text-sm underline opacity-70">← {t('adminS.dashboard')}</Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/admin" className="text-sm underline opacity-70">← {t('adminS.dashboard')}</Link>
+          <Link to="/" className="ms-auto text-sm underline opacity-70 hover:opacity-100">← {t('adminS.backToSite')}</Link>
+        </div>
         <h1 className="mt-1 text-2xl font-extrabold">{submission.game.title} <span className="text-base font-normal opacity-60">v{submission.version.version}</span></h1>
         <p className="text-sm opacity-60">{submission.state}</p>
       </div>
