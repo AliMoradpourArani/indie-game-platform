@@ -40,4 +40,6 @@ export function requireRole(...roles: TokenPayload['role'][]) {
 }
 
 export const requireAdmin = requireRole('ADMIN');
-export const requireDeveloper = requireRole('DEVELOPER', 'ADMIN');
+// Strict separation (#7): developer endpoints accept DEVELOPER only — admins use
+// admin endpoints. Previously ADMIN was included here.
+export const requireDeveloper = requireRole('DEVELOPER');

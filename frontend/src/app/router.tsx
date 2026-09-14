@@ -4,7 +4,8 @@ import { AdminLoginPage, LoginPage, RegisterPage } from './authPages';
 import { DeveloperDashboard, DeveloperGameDetail } from './developer';
 import { BrowsePage, DeveloperPage, GamePage, LibraryPage } from './games';
 import { AdminLayout, PublicLayout } from './layouts';
-import { HomePage, PlaceholderPage } from './pages';
+import { HomePage, NotFoundPage, PlaceholderPage } from './pages';
+import { PurchasePage } from './purchase';
 
 export const router = createBrowserRouter([
   {
@@ -13,6 +14,7 @@ export const router = createBrowserRouter([
       { path: '/', element: <HomePage /> },
       { path: '/browse', element: <BrowsePage /> },
       { path: '/games/:slug', element: <GamePage /> },
+      { path: '/purchase/:slug', element: <PurchasePage /> },
       { path: '/developers/:id', element: <DeveloperPage /> },
       { path: '/library', element: <LibraryPage /> },
       { path: '/developer', element: <DeveloperDashboard /> },
@@ -23,6 +25,7 @@ export const router = createBrowserRouter([
       { path: '/rules', element: <PlaceholderPage name="Rules" /> },
       { path: '/privacy', element: <PlaceholderPage name="Privacy" /> },
       { path: '/terms', element: <PlaceholderPage name="Terms" /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
   {

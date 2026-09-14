@@ -45,6 +45,14 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     });
     return;
   }
+  // Plain Errors with a numeric `status` (e.g. multer/file-required guards) map
+  // to that status instead of 500 so the error popup shows the right message.
+  if (err instanceof Error && 'status' in err && typeof (err as { status?: unknown }).status === 'number') {
+    const status = (err as { status: number }).status;
+    const code = status === 422 ? 'VALIDATION_ERROR' : status === 403 ? 'FORBIDDEN' : status === 404 ? 'NOT_FOUND' : 'BAD_REQUEST';
+    res.status(status).json({ error: { code, message: err.message || 'Invalid request' } });
+    return;
+  }
   logger.error({ err, requestId: (req as { requestId?: string }).requestId }, 'Unhandled error');
   res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' } });
 }

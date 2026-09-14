@@ -93,3 +93,199 @@ textarea:focus-visible {
     animation: none !important;
   }
 }
+
+/* ---- Motion + interaction system (UX consistency pass) ---- */
+
+/* Smooth theme cross-fade: theme switches at a gentle pace, never abrupt. */
+html.theme-anim,
+html.theme-anim body,
+html.theme-anim .surface,
+html.theme-anim .btn-accent {
+  transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease;
+}
+
+/* Buttons: subtle lift + press feedback everywhere. */
+button, .btn-accent, a.btn-accent {
+  transition: transform 0.16s ease, box-shadow 0.2s ease, opacity 0.2s ease, background-color 0.25s ease;
+}
+button:not(:disabled):hover, .btn-accent:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+button:not(:disabled):active, .btn-accent:not(:disabled):active {
+  transform: translateY(0) scale(0.98);
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Page transitions: each route fades/slides in once. */
+.page-enter {
+  animation: page-in 0.32s ease both;
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom dropdown (replaces native XP-style selects). */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-panel {
+  position: absolute;
+  z-index: 30;
+  min-width: 100%;
+  margin-top: 6px;
+  overflow: hidden;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  transform-origin: top center;
+  animation: dropdown-in 0.18s ease both;
+}
+[dir="rtl"] .dropdown-panel {
+  right: 0;
+}
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  text-align: start;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.dropdown-item:hover, .dropdown-item[data-active="true"] {
+  background: var(--accent-soft);
+}
+.dropdown-item .abbr {
+  margin-inline-start: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  opacity: 0.75;
+}
+.dropdown-chevron {
+  transition: transform 0.2s ease;
+}
+.dropdown[data-open="true"] .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+/* Sliding theme toggle with sun/moon icons. */
+.theme-toggle {
+  position: relative;
+  width: 64px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-sunken);
+  cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+.theme-toggle .knob {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), background-color 0.4s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.theme-toggle[data-theme="dark"] .knob {
+  transform: translateX(32px);
+}
+[dir="rtl"] .theme-toggle[data-theme="dark"] .knob {
+  transform: translateX(-32px);
+}
+.theme-toggle .track-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.theme-toggle .track-icon.sun { inset-inline-start: 8px; }
+.theme-toggle .track-icon.moon { inset-inline-end: 8px; }
+
+/* Error popup modal (replaces full-page errors). */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.45);
+  animation: backdrop-in 0.22s ease both;
+}
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal-card {
+  width: 100%;
+  max-width: 26rem;
+  padding: 24px;
+  text-align: center;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+  animation: modal-pop 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.modal-card.confirm {
+  border-color: var(--line);
+}
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 22px;
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+.modal-card.confirm .modal-icon {
+  background: var(--accent-soft);
+}
+
+/* Star rating. */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.stars button {
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--ink-muted);
+  opacity: 0.55;
+}
+.stars button[data-filled="true"] {
+  color: #f59e0b;
+  opacity: 1;
+}

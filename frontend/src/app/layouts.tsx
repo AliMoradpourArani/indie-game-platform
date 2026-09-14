@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router-dom';
 import { applyLocale, type Locale } from '../i18n/config';
+import { Dropdown, ThemeToggle } from '../design/ui';
 import { useAuth } from './auth';
 import { useTheme } from './useTheme';
 
@@ -18,19 +19,16 @@ function Controls() {
 
   return (
     <div className="flex items-center gap-2">
-      <label className="sr-only" htmlFor="locale">{t('lang.label')}</label>
-      <select
-        id="locale"
+      <Dropdown
+        label={t('lang.label')}
         value={locale}
-        onChange={(e) => switchLocale(e.target.value as Locale)}
-        className="surface px-2 py-1 text-sm"
-      >
-        <option value="en">English</option>
-        <option value="fa">فارسی</option>
-      </select>
-      <button onClick={toggle} className="surface px-3 py-1 text-sm" type="button">
-        {theme === 'dark' ? t('theme.light') : t('theme.dark')}
-      </button>
+        onChange={(v) => switchLocale(v as Locale)}
+        options={[
+          { value: 'en', label: 'English', abbr: 'EN' },
+          { value: 'fa', label: 'فارسی', abbr: 'FA' },
+        ]}
+      />
+      <ThemeToggle theme={theme} onToggle={toggle} label={theme === 'dark' ? t('theme.light') : t('theme.dark')} />
     </div>
   );
 }
@@ -78,7 +76,7 @@ export function PublicLayout() {
       <div className="pb-3 sm:hidden">
         <Controls />
       </div>
-      <main id="main" className="flex-1 py-6">
+      <main id="main" className="page-enter flex-1 py-6">
         <Outlet />
       </main>
       <footer className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t py-6 text-sm opacity-80" style={{ borderColor: 'var(--line)' }}>
@@ -98,11 +96,14 @@ export function AdminLayout() {
   const { t } = useTranslation();
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-4">
-      <header className="flex items-center justify-between py-4">
-        <Link to="/admin/login" className="font-bold">◈ {t('footer.admin')}</Link>
+      <header className="flex items-center justify-between gap-3 py-4">
+        <div className="flex items-center gap-4">
+          <Link to="/admin/login" className="font-bold">◈ {t('footer.admin')}</Link>
+          <Link to="/" className="text-sm underline opacity-70 hover:opacity-100">← {t('adminS.backToSite')}</Link>
+        </div>
         <Controls />
       </header>
-      <main className="flex-1 py-6">
+      <main className="page-enter flex-1 py-6">
         <Outlet />
       </main>
     </div>

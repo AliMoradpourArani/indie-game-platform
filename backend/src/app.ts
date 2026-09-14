@@ -7,7 +7,8 @@ import { errorHandler, notFound, requestId, requestLogger } from './common/middl
 import { adminRouter } from './modules/admin/routes.js';
 import { authRouter } from './modules/auth/routes.js';
 import { downloadsRouter } from './modules/downloads/routes.js';
-import { gamesRouter } from './modules/games/routes.js';
+import { gameAdminRouter, gamesRouter } from './modules/games/routes.js';
+import { feedbackRouter } from './modules/feedback/routes.js';
 import { healthRouter } from './modules/health/routes.js';
 import { purchasesRouter } from './modules/purchases/routes.js';
 import { submissionsRouter } from './modules/submissions/routes.js';
@@ -35,6 +36,8 @@ export function createApp(): express.Express {
   app.use('/api/v1', healthRouter());
   app.use('/api/v1', authRouter());
   app.use('/api/v1', gamesRouter());
+  app.use('/api/v1', gameAdminRouter());
+  app.use('/api/v1', feedbackRouter());
   app.use('/api/v1', submissionsRouter());
   app.use('/api/v1', adminRouter());
   app.use('/api/v1', purchasesRouter());

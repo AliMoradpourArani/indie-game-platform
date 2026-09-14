@@ -74,6 +74,8 @@ model User {
   entitlements     Entitlement[]
   downloadTokens   DownloadToken[]
   auditActions     AuditLog[]        @relation("Actor")
+  comments         GameComment[]
+  ratings          GameRating[]
 }
 
 model Profile {
@@ -108,15 +110,20 @@ model Game {
   developer   User     @relation("DeveloperGames", fields: [developerId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  isArchived  Boolean  @default(false)
+  archivedAt  DateTime?
 
   versions     GameVersion[]
   media        GameMedia[]
   submissions  Submission[]
   purchases    Purchase[]
   entitlements Entitlement[]
+  comments     GameComment[]
+  ratings      GameRating[]
 
   @@index([genre])
   @@index([developerId])
+  @@index([isArchived])
 }
 
 model GameVersion {
@@ -198,6 +205,7 @@ model Purchase {
   status         PurchaseStatus @default(PENDING)
   providerRef    String?        @unique
   idempotencyKey String         @unique
+  discountCode   String?
   createdAt      DateTime       @default(now())
 
   entitlements Entitlement[]
@@ -239,4 +247,51 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@index([entityType, entityId])
+}
+
+model GameComment {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([gameId, createdAt])
+}
+
+model GameRating {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stars     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gameId, userId])
+  @@index([gameId])
+}
+
+model DiscountCode {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  percentOff Int
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([active])
+}
+
+model GameDeletionLog {
+  id        String   @id @default(cuid())
+  gameId    String
+  title     String
+  reason    String
+  deletedBy String
+  createdAt DateTime @default(now())
+
+  @@index([gameId])
 }

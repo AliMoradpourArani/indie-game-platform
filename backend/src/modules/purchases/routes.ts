@@ -10,13 +10,13 @@ export function purchasesRouter(): Router {
 
   router.post('/purchases/checkout', requireAuth, async (req: AuthRequest, res: Response, next) => {
     try {
-      const body = z.object({ gameId: z.string().min(1) }).parse(req.body);
+      const body = z.object({ gameId: z.string().min(1), discountCode: z.string().min(1).max(32).optional() }).parse(req.body);
       const key = req.headers['idempotency-key'];
       if (typeof key !== 'string' || key.length < 8) {
         res.status(422).json({ error: { code: 'VALIDATION_ERROR', message: 'Idempotency-Key header is required' } });
         return;
       }
-      const result = await checkout({ db: prisma }, req.auth!.sub, body.gameId, key);
+      const result = await checkout({ db: prisma }, req.auth!.sub, body.gameId, key, body.discountCode);
       res.status(201).json(result);
     } catch (err) {
       next(err);

@@ -5,12 +5,15 @@ import { z } from 'zod';
 import { loadConfig } from '../../config/env.js';
 import { prisma } from '../../infrastructure/db.js';
 import { LocalStorageService } from '../../infrastructure/storage/localStorage.js';
-import { requireAuth, requireDeveloper, type AuthRequest } from '../auth/middleware.js';
+import { requireAdmin, requireAuth, requireDeveloper, type AuthRequest } from '../auth/middleware.js';
 import {
+  archiveGame,
   createGame,
   createVersion,
+  deleteGame,
   getPublicGame,
   listOwnGames,
+  unarchiveGame,
   updateGame,
   uploadBuild,
   uploadMedia,
@@ -136,6 +139,82 @@ export function gamesRouter(): Router {
       }
     },
   );
+
+  // Archive / unarchive: studios (own games) and admins.
+  router.post('/developer/games/:id/archive', requireAuth, requireDeveloper, async (req: AuthRequest, res: Response, next) => {
+    try {
+      const d = deps();
+      res.json(await archiveGame(d, req.params.id, req.auth!.sub, req.auth!.role, req.ip));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/developer/games/:id/unarchive', requireAuth, requireDeveloper, async (req: AuthRequest, res: Response, next) => {
+    try {
+      const d = deps();
+      res.json(await unarchiveGame(d, req.params.id, req.auth!.sub, req.auth!.role, req.ip));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Serve game media bytes (covers/screenshots) for the public game page.
+  // Publish-gated + archive-gated: hidden games 404 like the detail endpoint.
+  router.get('/games/:slug/media/:mediaId', async (req: Request, res: Response, next) => {
+    try {
+      const game = await getPublicGame(deps(), req.params.slug);
+      const item = (game as { media: { id: string; storageKey: string }[] }).media.find((m) => m.id === req.params.mediaId);
+      if (!item) {
+        res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Media not found' } });
+        return;
+      }
+      const d = deps();
+      const stream = await d.storage.get(item.storageKey);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      stream.pipe(res);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  return router;
+}
+
+export function gameAdminRouter(): Router {
+  const router = Router();
+
+  router.post('/admin/games/:id/archive', requireAuth, requireAdmin, async (req: AuthRequest, res: Response, next) => {
+    try {
+      const config = loadConfig();
+      const d = { db: prisma, storage: new LocalStorageService(config.STORAGE_ROOT) };
+      res.json(await archiveGame(d, req.params.id, req.auth!.sub, req.auth!.role, req.ip));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/admin/games/:id/unarchive', requireAuth, requireAdmin, async (req: AuthRequest, res: Response, next) => {
+    try {
+      const config = loadConfig();
+      const d = { db: prisma, storage: new LocalStorageService(config.STORAGE_ROOT) };
+      res.json(await unarchiveGame(d, req.params.id, req.auth!.sub, req.auth!.role, req.ip));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Permanent deletion: admin only, reason required, confirm in UI first.
+  router.delete('/admin/games/:id', requireAuth, requireAdmin, async (req: AuthRequest, res: Response, next) => {
+    try {
+      const body = z.object({ reason: z.string().min(3).max(2000) }).parse(req.body);
+      const config = loadConfig();
+      const d = { db: prisma, storage: new LocalStorageService(config.STORAGE_ROOT) };
+      res.json(await deleteGame(d, req.params.id, req.auth!.sub, body.reason, req.ip));
+    } catch (err) {
+      next(err);
+    }
+  });
 
   return router;
 }

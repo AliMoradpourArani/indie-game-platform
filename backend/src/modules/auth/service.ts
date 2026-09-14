@@ -38,12 +38,17 @@ export async function registerUser(deps: Deps, input: RegisterInput): Promise<Au
   };
 }
 
-export async function loginUser(deps: Deps, input: LoginInput): Promise<AuthResult> {
+export async function loginUser(deps: Deps, input: LoginInput, opts?: { allow?: Role[] }): Promise<AuthResult> {
   const user = await deps.db.user.findUnique({ where: { email: input.email.toLowerCase() } });
   // Same error for unknown email vs wrong password (no account enumeration).
   if (!user || user.status !== 'ACTIVE') throw Errors.unauthorized('Invalid email or password');
   const ok = await verifyPassword(input.password, user.passwordHash);
   if (!ok) throw Errors.unauthorized('Invalid email or password');
+  if (opts?.allow && !opts.allow.includes(user.role)) {
+    // Strict portal separation: admins use /auth/admin/login, players/devs use /auth/login.
+    if (user.role === 'ADMIN') throw Errors.forbidden('Administrators must sign in via the admin portal');
+    throw Errors.forbidden('This account cannot sign in via the admin portal');
+  }
 
   return {
     token: signToken({ sub: user.id, role: user.role }, deps.jwtSecret, deps.jwtExpiresIn),

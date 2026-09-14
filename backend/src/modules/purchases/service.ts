@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import { Errors } from '../../common/errors.js';
 import { LocalTestPaymentProvider, type PaymentProvider } from '../../infrastructure/payments/localTestProvider.js';
+import { validateDiscount } from '../feedback/service.js';
 import { shouldGrantEntitlement } from '../library/entitlement.js';
 
 // Singleton provider for Stage 0 (in-process). A real PSP would be request-scoped
@@ -18,7 +19,7 @@ interface Deps {
 
 async function publishedOrThrow(db: PrismaClient, gameId: string) {
   const game = await db.game.findUnique({ where: { id: gameId } });
-  if (!game) throw Errors.notFound('Game not found');
+  if (!game || game.isArchived) throw Errors.notFound('Game not found');
   const latest = await db.submission.findFirst({ where: { gameId }, orderBy: { updatedAt: 'desc' } });
   if (!latest || latest.state !== 'PUBLISHED') throw Errors.notFound('Game not found');
   return game;
@@ -28,17 +29,23 @@ async function publishedOrThrow(db: PrismaClient, gameId: string) {
  * Starts a purchase. Idempotent on Idempotency-Key: retried checkouts return the
  * original record instead of double-charging. Free games complete immediately.
  */
-export async function checkout(deps: Deps, buyerId: string, gameId: string, idempotencyKey: string) {
+export async function checkout(deps: Deps, buyerId: string, gameId: string, idempotencyKey: string, discountCode?: string) {
   const game = await publishedOrThrow(deps.db, gameId);
 
   const existing = await deps.db.purchase.findUnique({ where: { idempotencyKey } });
   if (existing) return { purchase: existing, checkoutId: null as string | null };
 
-  if (game.priceCents === 0) {
+  const discount = await validateDiscount(deps, discountCode);
+  const amountCents = discount
+    ? Math.max(0, Math.round((game.priceCents * (100 - discount.percentOff)) / 100))
+    : game.priceCents;
+
+  if (amountCents === 0) {
     const purchase = await deps.db.purchase.create({
       data: {
         buyerId, gameId, amountCents: 0, currency: game.currency,
         status: 'COMPLETED', providerRef: `free_${gameId}_${buyerId}`, idempotencyKey,
+        discountCode: discount?.code,
       },
     });
     await grantEntitlement(deps.db, buyerId, gameId, purchase.id);
@@ -46,12 +53,13 @@ export async function checkout(deps: Deps, buyerId: string, gameId: string, idem
   }
 
   const co = await paymentProvider().createCheckout({
-    gameId, buyerId, amountCents: game.priceCents, currency: game.currency, idempotencyKey,
+    gameId, buyerId, amountCents, currency: game.currency, idempotencyKey,
   });
   const purchase = await deps.db.purchase.create({
     data: {
-      buyerId, gameId, amountCents: game.priceCents, currency: game.currency,
+      buyerId, gameId, amountCents, currency: game.currency,
       status: 'PENDING', providerRef: co.checkoutId, idempotencyKey,
+      discountCode: discount?.code,
     },
   });
   return { purchase, checkoutId: co.checkoutId };

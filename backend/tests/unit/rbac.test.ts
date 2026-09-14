@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { AuthRequest } from '../../src/modules/auth/middleware.js';
-import { requireAdmin, requireAuth, requireRole } from '../../src/modules/auth/middleware.js';
+import { requireAdmin, requireAuth, requireDeveloper, requireRole } from '../../src/modules/auth/middleware.js';
 import { signToken } from '../../src/modules/auth/tokens.js';
 
 const SECRET = 'test-secret-that-is-long-enough-1234';
@@ -37,5 +37,21 @@ describe('RBAC guards', () => {
     const nextAdmin = vi.fn();
     requireRole('ADMIN', 'DEVELOPER')(reqAdmin, {} as never, nextAdmin);
     expect(nextAdmin).toHaveBeenCalledWith();
+  });
+
+  it('strict portal separation: requireDeveloper rejects ADMIN (admins use admin endpoints)', () => {
+    const admin = signToken({ sub: 'a1', role: 'ADMIN' }, SECRET, '1h');
+    const reqAdmin = reqWith(`Bearer ${admin}`);
+    requireAuth(reqAdmin, {} as never, vi.fn());
+    const next = vi.fn();
+    requireDeveloper(reqAdmin, {} as never, next);
+    expect(next.mock.calls[0][0]?.status).toBe(403);
+
+    const dev = signToken({ sub: 'd1', role: 'DEVELOPER' }, SECRET, '1h');
+    const reqDev = reqWith(`Bearer ${dev}`);
+    requireAuth(reqDev, {} as never, vi.fn());
+    const nextDev = vi.fn();
+    requireDeveloper(reqDev, {} as never, nextDev);
+    expect(nextDev).toHaveBeenCalledWith();
   });
 });

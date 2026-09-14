@@ -58,3 +58,15 @@ export function PlaceholderPage({ name }: { name: string }) {
     </section>
   );
 }
+
+export function NotFoundPage() {
+  const { t } = useTranslation();
+  return (
+    <section className="surface mx-auto max-w-xl p-8 text-center">
+      <h1 className="text-xl font-bold">{t('browse.notFound')}</h1>
+      <p className="mt-2 text-sm opacity-70">
+        <Link to="/" className="underline">{t('nav.home')}</Link>
+      </p>
+    </section>
+  );
+}
