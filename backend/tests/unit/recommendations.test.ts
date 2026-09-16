@@ -14,7 +14,7 @@ import {
 } from '../../src/modules/recommendations/domain.js';
 import { MAX_ONBOARDING_SELECTIONS, PREFERENCE_GAMES } from '../../src/modules/recommendations/preferenceGames.js';
 import { recordEvent } from '../../src/modules/recommendations/service.js';
-import { eventSchema, onboardingSchema } from '../../src/modules/recommendations/validation.js';
+import { eventSchema, clientEventSchema, onboardingSchema } from '../../src/modules/recommendations/validation.js';
 import { EVENT_WEIGHTS, MAX_PER_GENRE } from '../../src/modules/recommendations/weights.js';
 
 function game(over: Partial<GameMeta> & { id: string }): GameMeta {
@@ -52,6 +52,11 @@ describe('event model', () => {
     expect(() => eventSchema.parse({ type: 'GAME_ADDED_TO_CART', gameId: 'g1' })).toThrow();
     expect(EVENT_WEIGHTS.GAME_PURCHASED).toBeGreaterThan(EVENT_WEIGHTS.GAME_VIEWED);
     expect(EVENT_WEIGHTS.DEMO_DOWNLOADED).toBeGreaterThan(EVENT_WEIGHTS.GAME_VIEW_REPEATED);
+  });
+
+  it('never accepts client purchase claims (server emits them, §51)', () => {
+    expect(() => clientEventSchema.parse({ type: 'GAME_PURCHASED', gameId: 'g1' })).toThrow();
+    expect(clientEventSchema.parse({ type: 'GAME_VIEWED', gameId: 'g1' }).type).toBe('GAME_VIEWED');
   });
 
   it('stores a repeat view when the game was already viewed within 24h', async () => {

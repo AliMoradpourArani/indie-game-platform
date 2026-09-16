@@ -34,6 +34,13 @@ export const SUPPORTED_EVENT_TYPES: SupportedEventType[] = [
   'GAME_OPENED_FROM_RECOMMENDATION',
 ];
 
+/**
+ * What browsers may submit via POST /events. GAME_PURCHASED is deliberately
+ * excluded: purchase signals are emitted server-side by the purchases module
+ * from trusted tables — client purchase claims are never accepted (§51).
+ */
+export const CLIENT_EVENT_TYPES = SUPPORTED_EVENT_TYPES.filter((t) => t !== 'GAME_PURCHASED');
+
 /** Recency half-life: a signal's contribution halves every HALF_LIFE_DAYS. */
 export const HALF_LIFE_DAYS = 30;
 

@@ -58,7 +58,7 @@ GET  /preferences/games                     # external taste anchors (public)
 GET  /onboarding                            # {completed, skipped} (auth)
 POST /onboarding {externalGameIds: 0–5}     # save taste anchors (auth)
 POST /onboarding/skip                       # (auth)
-POST /events {type, gameId?, metadata?}     # behavior tracking (auth)
+POST /events {type, gameId?, metadata?}     # behavior tracking (auth, no purchase claims)
 GET  /recommendations?limit=10              # personalized|cold-start (optional auth)
 GET  /games/:slug/similar?limit=8           # similar games (optional auth)
 ```

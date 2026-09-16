@@ -12,7 +12,7 @@ import {
   skipOnboarding,
   assertSupportedType,
 } from './service.js';
-import { eventSchema, limitSchema, onboardingSchema } from './validation.js';
+import { clientEventSchema, limitSchema, onboardingSchema } from './validation.js';
 
 export function recommendationsRouter(): Router {
   const router = Router();
@@ -47,10 +47,11 @@ export function recommendationsRouter(): Router {
     }
   });
 
-  // Behavior events — server validates type + game; ownership truth stays server-side.
+  // Behavior events — purchase claims are rejected here; the purchases module
+  // emits GAME_PURCHASED server-side from trusted tables (§51).
   router.post('/events', requireAuth, async (req: AuthRequest, res: Response, next) => {
     try {
-      const body = eventSchema.parse(req.body);
+      const body = clientEventSchema.parse(req.body);
       assertSupportedType(body.type);
       const created = await recordEvent(
         prisma,

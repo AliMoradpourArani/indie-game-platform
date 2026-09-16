@@ -98,6 +98,8 @@ games", "Shares tag,…", "New release…") — never fabricated.
 GET  /preferences/games
 GET  /onboarding / POST /onboarding / POST /onboarding/skip   (auth)
 POST /events {type, gameId?, metadata?}                        (auth)
+  # GAME_PURCHASED is rejected from browsers; the purchases module emits it
+  # server-side from trusted tables (§51).
 GET  /recommendations?limit=10                                 (optional auth)
 GET  /games/:slug/similar?limit=8                              (optional auth)
 ```
