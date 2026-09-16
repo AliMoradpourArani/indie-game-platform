@@ -11,6 +11,7 @@ import { gameAdminRouter, gamesRouter } from './modules/games/routes.js';
 import { feedbackRouter } from './modules/feedback/routes.js';
 import { healthRouter } from './modules/health/routes.js';
 import { purchasesRouter } from './modules/purchases/routes.js';
+import { recommendationsRouter } from './modules/recommendations/routes.js';
 import { submissionsRouter } from './modules/submissions/routes.js';
 import { usersRouter } from './modules/users/routes.js';
 
@@ -60,6 +61,7 @@ export function createApp(): express.Express {
   app.use('/api/v1', submissionsRouter());
   app.use('/api/v1', adminRouter());
   app.use('/api/v1', purchasesRouter());
+  app.use('/api/v1', recommendationsRouter());
   app.use('/api/v1', downloadsRouter());
   app.use('/api/v1', usersRouter());
   void config;
