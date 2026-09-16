@@ -16,6 +16,8 @@ A modern, production-ready, open-source digital distribution platform and market
 
 ### 🎮 Player Discovery & Library Experience
 * **Rich Game Discovery:** Filter by genre, tag, and search query with server-side pagination, instant sorting, and responsive grid layouts.
+* **Personalized Recommendations:** Rule-based engine learns from onboarding taste anchors, game views, demo downloads, purchases, and ratings — with time decay, transparent scoring, genre diversity, and cold-start fallbacks (`Recommended for you` + `You might also like` rail). See [`docs/RECOMMENDATIONS.md`](docs/RECOMMENDATIONS.md).
+* **First-Time Onboarding:** New registrants pick up to 5 well-known games to seed their taste profile (or skip); completion persists so it only ever shows once.
 * **Full Game Showcases:** Comprehensive title pages featuring high-resolution screenshot galleries with interactive lightboxes, system requirements, changelogs, developer studio profiles, and verified status badges.
 * **Community Feedback:** Interactive 5-star rating aggregates and verified player comments.
 * **Frictionless Checkout & Free Claims:** One-click claims for free indie games, simulated payment gateway with idempotency protection, and instant discount codes (`WELCOME20`, `INDIE10`, `LAUNCH50`).
@@ -64,9 +66,10 @@ indie-game-platform/
 │   │   │   ├── auth/                # JWT auth, password hashing, RBAC middleware, rate limits
 │   │   │   ├── downloads/           # HMAC download token issuance & file streaming
 │   │   │   ├── feedback/            # Game comments and star rating aggregations
-│   │   │   ├── games/               # Catalog discovery, developer studio CRUD, visual uploads
-│   │   │   ├── purchases/           # Checkout, idempotency, discounts, library entitlements
-│   │   │   ├── submissions/         # Moderation state machine & admin claim/review workflow
+│ │   │   ├── games/               # Catalog discovery, developer studio CRUD, visual uploads
+│ │   │   ├── purchases/           # Checkout, idempotency, discounts, library entitlements
+│ │   │   ├── recommendations/     # Behavior events, taste profiles, rule-based scoring & feeds
+│ │   │   ├── submissions/         # Moderation state machine & admin claim/review workflow
 │   │   │   └── users/               # User profiles and studio verification
 │   │   ├── infrastructure/          # Decoupled drivers (LocalStorageService, TestPaymentProvider)
 │   │   ├── common/                  # AppError taxonomy, logging, security middleware
@@ -74,7 +77,7 @@ indie-game-platform/
 │   └── tests/                       # Vitest unit & integration test suites
 ├── frontend/                        # Vite + React 18 + TypeScript + Tailwind CSS v4
 │   ├── src/
-│   │   ├── app/                     # Views & pages (Home, Browse, GamePage, Developer, Admin, Auth)
+│ │   ├── app/                     # Views & pages (Home, Browse, GamePage, Onboarding, Developer, Admin, Auth)
 │   │   ├── design/                  # CSS tokens, theme switcher, modal dialogs, states
 │   │   ├── i18n/                    # English (en) & Persian (fa) localization resources
 │   │   ├── lib/                     # API client with typed errors and JSON parsing
@@ -202,6 +205,11 @@ All endpoints are mounted under `/api/v1`:
 | **Discovery** | `GET /games` | Public | Browse published games with filter/sort |
 | **Discovery** | `GET /games/:slug` | Public | Public game details, media, builds, comments |
 | **Discovery** | `GET /genres` | Public | List genres with published titles |
+| **Recommend** | `GET /preferences/games` | Public | Onboarding taste anchors (never purchasable) |
+| **Recommend** | `GET\|POST /onboarding`, `POST /onboarding/skip` | Bearer Token | Taste-anchor selection & once-only gate |
+| **Recommend** | `POST /events` | Bearer Token | Behavior tracking (purchase claims rejected) |
+| **Recommend** | `GET /recommendations` | Optional auth | Personalized feed, cold-start fallback |
+| **Recommend** | `GET /games/:slug/similar` | Optional auth | Similar-games rail |
 | **Studio** | `GET /developer/games` | Developer | List developer's authored games |
 | **Studio** | `POST /developer/games` | Developer | Create new game draft |
 | **Studio** | `POST /developer/games/:id/versions` | Developer | Create new semantic version |

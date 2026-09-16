@@ -54,9 +54,9 @@ gradually personalizes). Unit tests already pin the engine rules behind it.
 
 ## 6. Current scoreboard (Phase 8 + recommendations)
 
-- Backend: **47 passed / 7 skipped** (skips require `TEST_DATABASE_URL`).
-  New `tests/unit/recommendations.test.ts` (14 tests): catalog integrity,
-  5-cap validation, supported event types, repeat-view upgrade, decay
+- Backend: **48 passed / 7 skipped** (skips require `TEST_DATABASE_URL`).
+  New `tests/unit/recommendations.test.ts` (15 tests): catalog integrity,
+  5-cap validation, supported event types, client purchase-claim rejection, repeat-view upgrade, decay
   monotonicity, profile derivation, same-genre similarity priority, ranking
   over popularity, truthful explanations, genre cap + backfill, cold-start
   ordering.

@@ -73,25 +73,20 @@
       - Seeded 6 rich showcase games with full details, artwork, multi-platform builds, reviews, and discount codes.
       - Added MIT License and comprehensive open-source README.
 
-- [x] Recommendations & discovery (branch `feat/recommendations`):
+- [x] Recommendations & discovery (merged PR #3, live-E2E verified):
       rule-based engine + event tracking + onboarding + homepage feed +
-      similar-games carousel, 14 unit tests, en/fa + RTL + themes.
-      Awaiting live-DB verification before merge.
+      similar-games carousel, 15 unit tests, en/fa + RTL + themes.
 
 ## In progress
 
-- Recommendations & discovery on branch `feat/recommendations` (4 commits):
-  backend module + tests, onboarding/feed/carousel UI, docs. Pending: DB
-  migration apply (`npx prisma migrate dev` needs Docker), live journey check,
-  PR review → merge.
+- None. Recommendations merged; live-E2E verified against local Postgres.
 
 ## Broken / blockers
 
-- None in code. Live verification (migration + seeded E2E click-through) needs
-  Docker/Postgres, unavailable in this environment — flagged in the PR.
+- None. Database migrated and seeded, all tests green, frontend builds clean.
 
 ## Git
 
-- Latest commit: (to be recorded after PR merge)
-- Branch: `feat/recommendations`, remote `origin`
+- Latest commit: `073873c` Merge pull request #3 (recommendations)
+- Branch: `main`, remote `origin`
 
