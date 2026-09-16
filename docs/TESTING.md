@@ -46,8 +46,19 @@ PostgreSQL is available (`docker compose up -d db`): register→browse→purchas
 library→download and the full submission cycle. No E2E harness is committed until
 it can run green — un-runnable tests are not committed.
 
-## 6. Current scoreboard (Phase 8)
+Recommendation E2E (also pending live DB + browser harness): register → choose
+role → onboarding (select 5, sixth stays disabled, deselect re-enables, continue)
+→ homepage shows personalized feed → open reco game (`?src=reco`) → similar-games
+rail scrolls → event rows recorded; plus the skip path (generic feed, behavior
+gradually personalizes). Unit tests already pin the engine rules behind it.
 
-- Backend: **32 passed / 7 skipped** (skips require `TEST_DATABASE_URL`).
+## 6. Current scoreboard (Phase 8 + recommendations)
+
+- Backend: **47 passed / 7 skipped** (skips require `TEST_DATABASE_URL`).
+  New `tests/unit/recommendations.test.ts` (14 tests): catalog integrity,
+  5-cap validation, supported event types, repeat-view upgrade, decay
+  monotonicity, profile derivation, same-genre similarity priority, ranking
+  over popularity, truthful explanations, genre cap + backfill, cold-start
+  ordering.
 - `tsc` clean on both apps; `vite build` clean; `prisma validate` + `migrate diff` clean.
 - Security suite: headers, CORS, 422 shape, token 401s, rate limiting — green.

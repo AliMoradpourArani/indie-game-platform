@@ -67,14 +67,15 @@ export function RegisterPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const user = await register({
+      await register({
         email: form.email,
         password: form.password,
         role: form.role,
         displayName: form.displayName,
         studioName: form.role === 'DEVELOPER' ? form.studioName || form.displayName : undefined,
       });
-      navigate(user.role === 'DEVELOPER' ? '/developer' : '/library', { replace: true });
+      // First-time users pick taste anchors before entering the site.
+      navigate('/onboarding', { replace: true });
     } catch (err) {
       popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
     } finally {

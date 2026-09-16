@@ -76,6 +76,8 @@ model User {
   auditActions     AuditLog[]        @relation("Actor")
   comments         GameComment[]
   ratings          GameRating[]
+  events           UserEvent[]
+  preferences      UserPreference[]
 }
 
 model Profile {
@@ -86,6 +88,8 @@ model Profile {
   bio         String?
   locale      String  @default("en")
   theme       String  @default("system")
+  onboardingCompleted Boolean @default(false)
+  onboardingSkipped   Boolean @default(false)
 }
 
 model DeveloperProfile {
@@ -120,6 +124,7 @@ model Game {
   entitlements Entitlement[]
   comments     GameComment[]
   ratings      GameRating[]
+  events       UserEvent[]
 
   @@index([genre])
   @@index([developerId])
@@ -294,4 +299,42 @@ model GameDeletionLog {
   createdAt DateTime @default(now())
 
   @@index([gameId])
+}
+
+// ---- Recommendations subsystem (see docs/RECOMMENDATIONS.md) ----
+// External preference anchors live in code (preferenceGames.ts), never as Game rows.
+
+enum RecommendationEventType {
+  GAME_VIEWED
+  GAME_VIEW_REPEATED
+  DEMO_DOWNLOADED
+  GAME_PURCHASED
+  RECOMMENDATION_CLICKED
+  GAME_OPENED_FROM_RECOMMENDATION
+}
+
+model UserEvent {
+  id        String                  @id @default(cuid())
+  userId    String
+  user      User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType RecommendationEventType
+  gameId    String?
+  game      Game?                   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  metadata  Json?
+  createdAt DateTime                @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, eventType])
+  @@index([gameId])
+}
+
+model UserPreference {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  externalGameId String
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, externalGameId])
+  @@index([userId])
 }

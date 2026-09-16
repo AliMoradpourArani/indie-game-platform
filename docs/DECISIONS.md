@@ -84,3 +84,18 @@ Options / Chosen / Why / Trade-offs / Future implications.
 - **Context:** No cloud infra available.
 - **Chosen:** `docker-compose.yml` with Postgres 16; everything else in-process/local.
 - **Why:** Reproducible one-command DB; zero external accounts.
+
+## ADR-011: Rule-based recommendations; external anchors for cold start
+
+- **Context:** No behavior history for new users; no ML infra at Stage 0.
+- **Options:** (a) ML/collaborative filtering now, (b) rule-based weighted scoring
+  with onboarding taste anchors, (c) no personalization.
+- **Chosen:** (b). Static catalog of 12 well-known external games (never Game rows)
+  seeds a normalized interest profile; decayed behavior weights + purchase/rating
+  signals refine it. RecommendationStrategy port reserves ML later.
+- **Why:** Explainable, testable without a DB, zero new infrastructure, solves
+  cold start on day one.
+- **Trade-offs:** Cruder than collaborative filtering; popularity bias guarded by
+  diversity cap + discovery slot rather than eliminated.
+- **Future:** Content-based v2 ? collaborative ? hybrid ML behind the same port;
+  precompute/cache only with measured need (see SCALE_PLAN, RECOMMENDATIONS.md).

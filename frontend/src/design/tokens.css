@@ -273,6 +273,117 @@ button:disabled {
   background: var(--accent-soft);
 }
 
+/* ---- Recommendations: carousel rail (touch swipe + keyboard + RTL native) ---- */
+.reco-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 72%;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 4px;
+  padding-block: 4px;
+  overscroll-behavior-inline: contain;
+}
+@media (min-width: 640px) {
+  .reco-rail { grid-auto-columns: 44%; }
+}
+@media (min-width: 1024px) {
+  .reco-rail { grid-auto-columns: 31%; }
+}
+.reco-rail > .reco-card {
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+/* Skeleton shimmer for recommendation loading states. */
+.reco-shimmer {
+  background: linear-gradient(100deg, var(--bg-sunken) 40%, var(--line) 50%, var(--bg-sunken) 60%);
+  background-size: 200% 100%;
+  animation: reco-shimmer 1.4s ease infinite;
+}
+@keyframes reco-shimmer {
+  from { background-position: 180% 0; }
+  to { background-position: -20% 0; }
+}
+
+/* ---- Onboarding: preference selection grid ---- */
+.onboarding-hero {
+  background: linear-gradient(180deg, var(--accent-soft), var(--bg-raised));
+}
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+@media (min-width: 640px) {
+  .onboarding-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .onboarding-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.onboarding-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.22s ease, opacity 0.22s ease, border-color 0.22s ease;
+}
+.onboarding-card:not([data-dimmed="true"]):hover {
+  transform: translateY(-3px);
+}
+.onboarding-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 7rem;
+  font-size: 2.6rem;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+.onboarding-name {
+  padding: 0.65rem 0.5rem 0.8rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.onboarding-check {
+  position: absolute;
+  top: 0.6rem;
+  inset-inline-end: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  background: var(--accent);
+  color: var(--accent-ink);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.onboarding-card[data-selected="true"] {
+  border-color: var(--accent);
+  border-width: 2px;
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 14px 30px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px) scale(1.015);
+}
+.onboarding-card[data-selected="true"] .onboarding-check {
+  opacity: 1;
+  transform: scale(1);
+}
+/* At 5/5, unselected cards dim but selected ones stay fully interactive. */
+.onboarding-card[data-dimmed="true"] {
+  opacity: 0.42;
+  filter: saturate(0.4);
+  cursor: not-allowed;
+}
+
 /* Star rating. */
 .stars {
   display: inline-flex;

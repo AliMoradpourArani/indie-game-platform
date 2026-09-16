@@ -43,3 +43,18 @@ export const requireAdmin = requireRole('ADMIN');
 // Strict separation (#7): developer endpoints accept DEVELOPER only — admins use
 // admin endpoints. Previously ADMIN was included here.
 export const requireDeveloper = requireRole('DEVELOPER');
+
+/**
+ * Attach auth when a valid Bearer token is present; otherwise continue
+ * anonymously. Used by recommendation endpoints that serve a cold-start
+ * fallback to guests and personalized results to signed-in users.
+ */
+export function optionalAuth(req: AuthRequest, _res: Response, next: NextFunction): void {
+  try {
+    const token = bearerToken(req);
+    if (token) req.auth = verifyToken(token, loadConfig().JWT_SECRET);
+    next();
+  } catch {
+    next();
+  }
+}

@@ -5,6 +5,7 @@ import { DeveloperDashboard, DeveloperGameDetail } from './developer';
 import { BrowsePage, DeveloperPage, GamePage, LibraryPage } from './games';
 import { AdminLayout, PublicLayout } from './layouts';
 import { HomePage, NotFoundPage, PlaceholderPage } from './pages';
+import { OnboardingPage } from './onboarding';
 import { PurchasePage } from './purchase';
 
 export const router = createBrowserRouter([
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: '/developer/games/:id', element: <DeveloperGameDetail /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
+      { path: '/onboarding', element: <OnboardingPage /> },
       { path: '/about', element: <PlaceholderPage name="About" /> },
       { path: '/rules', element: <PlaceholderPage name="Rules" /> },
       { path: '/privacy', element: <PlaceholderPage name="Privacy" /> },
