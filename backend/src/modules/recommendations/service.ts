@@ -305,9 +305,9 @@ export async function getSimilarGames(
   viewerId: string | null = null,
   now: number = Date.now(),
 ): Promise<{ strategy: string; items: RecommendationItem[] }> {
-  const current = await db.game.findUnique({ where: { slug }, select: { ...CARD_SELECT } });
+  const current = await db.game.findUnique({ where: { slug }, select: { ...CARD_SELECT, isArchived: true } });
   if (!current) throw Errors.notFound('Game not found');
-  if ((current as { isArchived?: boolean }).isArchived) throw Errors.notFound('Game not found');
+  if (current.isArchived) throw Errors.notFound('Game not found');
   const latest = await db.submission.findFirst({ where: { gameId: current.id }, orderBy: { updatedAt: 'desc' }, select: { state: true } });
   if (!latest || latest.state !== 'PUBLISHED') throw Errors.notFound('Game not found');
 

@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { ApiError, apiGet, apiPost } from '../lib/api';
+import { apiGet, apiPost } from '../lib/api';
 import { useAuth } from './auth';
 import type { CardGame } from './games';
-import { ErrorNote } from '../design/states';
 
 /** Fire-and-forget behavior event. Never blocks UI; never throws. */
 export function trackEvent(type: string, gameId?: string, metadata?: Record<string, unknown>): void {
@@ -202,21 +201,4 @@ export function SimilarGames({ slug, gameId }: { slug: string; gameId: string })
       </div>
     </section>
   );
-}
-
-export function RecommendationsError({ onRetry }: { onRetry: () => void }) {
-  const { t } = useTranslation();
-  return <ErrorNote message={t('reco.unavailable')} onRetry={onRetry} />;
-}
-
-export function useRecommendationHealth() {
-  const [ok, setOk] = useState(true);
-  useEffect(() => {
-    apiGet('/api/v1/preferences/games')
-      .then(() => setOk(true))
-      .catch((e: unknown) => {
-        if (e instanceof ApiError) setOk(false);
-      });
-  }, []);
-  return ok;
 }
