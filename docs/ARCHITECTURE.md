@@ -68,7 +68,10 @@ backend/src/modules/
 ├── media/         # cover/screenshot/trailer metadata + validation
 ├── admin/         # moderation queues, user/game management, audit viewer
 ├── notifications/ # interface only in Stage 0 (log-based impl)
-└── audit/         # append-only log of sensitive actions
+├── audit/         # append-only log of sensitive actions
+└── recommendations/ # behavior events, taste profiles, scoring, feeds
+    (domain/weights pure; service Prisma; routes REST; owns ALL scoring —
+     games/homepage/purchases only supply signals, see RECOMMENDATIONS.md)
 ```
 
 Do not add new modules to "look complete". A module earns existence when it owns

@@ -58,6 +58,13 @@ Purchase(id, buyerId, gameId, amountCents, currency, status: PENDING|COMPLETED|F
 Entitlement(id unique(userId, gameId), userId, gameId, purchaseId, grantedAt)  # library access
 DownloadToken(id, userId, buildId, expiresAt, usedAt?)  # controlled access
 
+UserEvent(id, userId, eventType: GAME_VIEWED|GAME_VIEW_REPEATED|DEMO_DOWNLOADED|
+  GAME_PURCHASED|RECOMMENDATION_CLICKED|GAME_OPENED_FROM_RECOMMENDATION,
+  gameId?, metadata JSON, createdAt)  # behavior signals for recommendations
+UserPreference(id, userId, externalGameId, createdAt)  # onboarding taste anchors
+  # externalGameId refers to the static catalog (preferenceGames.ts), NOT Game rows.
+Profile… += onboardingCompleted, onboardingSkipped  # once-only onboarding gate
+
 AuditLog(id, actorId?, action, entityType, entityId, diff JSON, ip?, createdAt)
 ```
 

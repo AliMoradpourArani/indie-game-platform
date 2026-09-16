@@ -73,16 +73,25 @@
       - Seeded 6 rich showcase games with full details, artwork, multi-platform builds, reviews, and discount codes.
       - Added MIT License and comprehensive open-source README.
 
+- [x] Recommendations & discovery (branch `feat/recommendations`):
+      rule-based engine + event tracking + onboarding + homepage feed +
+      similar-games carousel, 14 unit tests, en/fa + RTL + themes.
+      Awaiting live-DB verification before merge.
+
 ## In progress
 
-- None. All tasks and test scenarios verified.
+- Recommendations & discovery on branch `feat/recommendations` (4 commits):
+  backend module + tests, onboarding/feed/carousel UI, docs. Pending: DB
+  migration apply (`npx prisma migrate dev` needs Docker), live journey check,
+  PR review → merge.
 
 ## Broken / blockers
 
-- None. Database migrated and seeded, all tests green, frontend builds clean.
+- None in code. Live verification (migration + seeded E2E click-through) needs
+  Docker/Postgres, unavailable in this environment — flagged in the PR.
 
 ## Git
 
 - Latest commit: (to be recorded after PR merge)
-- Branch: `fix/dev-games-500-rate-limit-admin-nav`, remote `origin`
+- Branch: `feat/recommendations`, remote `origin`
 
