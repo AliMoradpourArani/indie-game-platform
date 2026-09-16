@@ -146,5 +146,25 @@
     "success": "Purchase complete — check your library!",
     "loginRequired": "Log in to purchase this game."
   },
-  "errorPopup": { "title": "Something went wrong", "ok": "OK" }
+  "errorPopup": { "title": "Something went wrong", "ok": "OK" },
+  "reco": {
+    "title": "Recommended for you",
+    "popularTitle": "Popular right now",
+    "personalizedHint": "Picked from your tastes and activity.",
+    "similar": "You might also like",
+    "prev": "Scroll recommendations backward",
+    "next": "Scroll recommendations forward",
+    "unavailable": "Recommendations are unavailable right now."
+  },
+  "onboarding": {
+    "title": "What games do you enjoy?",
+    "subtitle": "Choose up to 5 games to help us personalize your experience. You can continue with fewer — or skip entirely.",
+    "externalNote": "These are well-known games from across gaming, shown only to learn your taste. They are not for sale here.",
+    "counter": "{{count}} / {{max}} selected",
+    "continue": "Continue",
+    "skip": "Skip for now",
+    "selected": "selected",
+    "limitReached": "limit reached — deselect one to choose another",
+    "loadFailed": "We could not load the preference games, but you can still enter the site."
+  }
 }

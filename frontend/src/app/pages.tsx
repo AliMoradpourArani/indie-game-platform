@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { apiGet } from '../lib/api';
 import { GameCard, type BrowseResult } from './games';
+import { RecommendedForYou } from './recommendations';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -30,6 +31,8 @@ export function HomePage() {
           </span>
         </div>
       </div>
+
+      <RecommendedForYou />
 
       <div>
         <div className="flex items-baseline justify-between">

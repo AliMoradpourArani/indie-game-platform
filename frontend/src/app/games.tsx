@@ -5,6 +5,7 @@ import { ApiError, apiGet, apiPost } from '../lib/api';
 import { Dropdown, Stars, useErrorPopup } from '../design/ui';
 import { useAuth } from './auth';
 import { Empty, Loading } from '../design/states';
+import { SimilarGames, trackEvent } from './recommendations';
 
 export interface CardGame {
   id: string;
@@ -205,6 +206,7 @@ export function GamePage() {
     setBusy(true);
     try {
       const res = await apiGet<{ url: string }>(`/api/v1/library/${game.id}/download/${buildId}`, token);
+      trackEvent('DEMO_DOWNLOADED', game.id);
       window.location.href = res.url;
     } catch (err) {
       popup.show(err instanceof ApiError ? err.message : t('auth.genericError'));
@@ -410,6 +412,8 @@ export function GamePage() {
           </ul>
         </section>
       )}
+
+      <SimilarGames slug={game.slug} gameId={game.id} />
 
       {lightbox && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setLightbox(null)}>
